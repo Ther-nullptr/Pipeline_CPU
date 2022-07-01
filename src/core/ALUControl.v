@@ -1,105 +1,91 @@
 module ALUControl(ALUOp,
-                  Funct,
+                  funct,
                   ALUConf,
-                  Sign);
+                  sign);
     //Control Signals
-    input [3:0] ALUOp;
+    input [2:0] ALUOp;
     //Inst. Signals
-    input [5:0] Funct;
+    input [5:0] funct;
     //Output Control Signals
-    output reg [4:0] ALUConf;
-    output reg Sign;
+    output reg [3:0] ALUConf;
+    output reg sign;
     
-    //--------------Your code below-----------------------
     // MIPS Functs
-    parameter add_fun  = 6'h20;
-    parameter addu_fun = 6'h21; //! u
-    parameter sub_fun  = 6'h22;
-    parameter subu_fun = 6'h23; //! u
+    parameter ADD_FUN  = 6'h20;
+    parameter ADDU_FUN = 6'h21;
+    parameter SUB_FUN  = 6'h22;
+    parameter SUBU_FUN = 6'h23;
     
-    parameter and_fun = 6'h24;
-    parameter or_fun  = 6'h25;
-    parameter xor_fun = 6'h26;
-    parameter nor_fun = 6'h27;
+    parameter AND_FUN = 6'h24;
+    parameter OR_FUN  = 6'h25;
+    parameter XOR_FUN = 6'h26;
+    parameter NOR_FUN = 6'h27;
     
-    parameter sll_fun  = 6'h00;
-    parameter srl_fun  = 6'h02;
-    parameter sra_fun  = 6'h03;
-    parameter slt_fun  = 6'h2a;
-    parameter sltu_fun = 6'h2b; //! u
+    parameter SLL_FUN  = 6'h00;
+    parameter SRL_FUN  = 6'h02;
+    parameter SRA_FUN  = 6'h03;
+    parameter SLT_FUN  = 6'h2a;
+    parameter SLTU_FUN = 6'h2b;
     
-    parameter jr_fun   = 6'h08;
-    parameter jalr_fun = 6'h09;
+    parameter JR_FUN   = 6'h08;
+    parameter JALR_FUN = 6'h09;
     
     // ALUOp
-    parameter I1_op    = 3'b000; // I type: lw,sw
-    parameter I2_op    = 3'b001; // I type: beq
-    parameter R_op     = 3'b010; // R type
-    parameter and_op   = 3'b011; // andi
-    parameter slt_op   = 3'b100; // slti, sltiu
-    parameter addiu_op = 3'b101;
+    parameter I1_ALUOP  = 3'b000; // I type: lw,sw
+    parameter I2_ALUOP  = 3'b001; // I type: beq, and other branch commands
+    parameter R_ALUOP   = 3'b010; // R type
+    parameter AND_ALUOP = 3'b011; // andi
+    parameter SLT_ALUOP = 3'b100; // slti, sltiu
     
     // ALUConf signal
-    parameter and_ctrl = 5'b00000; // &
-    parameter or_ctrl  = 5'b00001; // |
-    parameter add_ctrl = 5'b00010; // +
-    parameter sub_ctrl = 5'b00110; // -
-    parameter slt_ctrl = 5'b00111; // set on less than
-    parameter nor_ctrl = 5'b01000; // nor
-    parameter xor_ctrl = 5'b01001; // xor
-    parameter sll_ctrl = 5'b01010; // <<
-    parameter srl_ctrl = 5'b10000; // >>
-    parameter sra_ctrl = 5'b10001; // >>(a)
-    
-    // parameter setsub_ctrl = 5'b11010;
+    parameter AND_CONF = 4'b0000; // &
+    parameter OR_CONF  = 4'b0001; // |
+    parameter ADD_CONF = 4'b0010; // +
+    parameter SUB_CONF = 4'b0011; // -
+    parameter SLT_CONF = 4'b0100; // set on less than
+    parameter NOR_CONF = 4'b0101; // nor
+    parameter XOR_CONF = 4'b0110; // xor
+    parameter SLL_CONF = 4'b0111; // <<
+    parameter SRL_CONF = 4'b1000; // >>
+    parameter SRA_CONF = 4'b1001; // >>(a)
     
     // step 1: to decide the signed & unsigned
     // I & R type
-    
     always @(*) begin
-        if (ALUOp[2:0] == 3'b010) begin
-            case(Funct)
-                addu_fun: Sign <= 0;
-                subu_fun: Sign <= 0;
-                sltu_fun: Sign <= 0;
-                default: Sign  <= 1;
+        if (ALUOp == R_ALUOP) begin
+            case(funct)
+                ADDU_FUN,SUBU_FUN,SLTU_FUN: sign <= 0;
+                default: sign                    <= 1;
             endcase
         end
     end
     
-    // step 2: generate ALUConf according to Funct
+    // step 2: generate ALUConf according to funct
     always @(*) begin
-        if (ALUOp == 3'b010) begin // R type, decide the ALUConf by Funct
-            case(Funct)
-                add_fun:ALUConf  <= add_ctrl;
-                addu_fun:ALUConf <= add_ctrl;
-                sub_fun:ALUConf  <= sub_ctrl;
-                subu_fun:ALUConf <= sub_ctrl;
-                
-                and_fun:ALUConf <= and_ctrl;
-                or_fun:ALUConf  <= or_ctrl;
-                xor_fun:ALUConf <= xor_ctrl;
-                nor_fun:ALUConf <= nor_ctrl;
-                
-                slt_fun:ALUConf  <= slt_ctrl;
-                sltu_fun:ALUConf <= slt_ctrl;
-                sll_fun:ALUConf  <= sll_ctrl;
-                srl_fun:ALUConf  <= srl_ctrl;
-                sra_fun:ALUConf  <= sra_ctrl;
+        if (ALUOp == R_ALUOP) begin // R type, decide the ALUConf by funct
+            case(funct)
+                ADD_FUN,ADDU_FUN:ALUConf  <= ADD_CONF;
+                SUB_FUN,SUBU_FUN:ALUConf  <= SUB_CONF;
+                AND_FUN:ALUConf <= AND_CONF;
+                OR_FUN:ALUConf  <= OR_CONF;
+                XOR_FUN:ALUConf <= XOR_CONF;
+                NOR_FUN:ALUConf <= NOR_CONF;
+                SLT_FUN,SLTU_FUN:ALUConf  <= SLT_CONF;
+                SLL_FUN:ALUConf  <= SLL_CONF;
+                SRL_FUN:ALUConf  <= SRL_CONF;
+                SRA_FUN:ALUConf  <= SRA_CONF;
             endcase
         end
-        else if (ALUOp == 3'b000) // use add
-            ALUConf <= add_ctrl;
-        else if (ALUOp == 3'b001) // use sub
-            ALUConf <= sub_ctrl;
-        else if (ALUOp == 3'b011) // use and
-            ALUConf <= and_ctrl;
-        else if (ALUOp == 3'b100) // use slt
-            ALUConf <= slt_ctrl;
+        else if (ALUOp == I1_ALUOP) // use add
+            ALUConf <= ADD_CONF;
+        else if (ALUOp == I2_ALUOP) // use sub
+            ALUConf <= SUB_CONF;
+        else if (ALUOp == AND_ALUOP) // use and
+            ALUConf <= AND_CONF;
+        else if (ALUOp == SLT_ALUOP) // use slt
+            ALUConf <= SLT_CONF;
         else
-            ALUConf <= add_ctrl;
+            ALUConf <= ADD_CONF;
     end
-    
-    //--------------Your code above-----------------------
     
 endmodule

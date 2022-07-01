@@ -10,14 +10,15 @@ module Control(OpCode,
                MemtoReg,
                ALUSrcA,
                ALUSrcB,
+               ALUOp,
                ExtOp,
                LuiOp);
     
     input [5:0] OpCode;
     input [5:0] Funct;
-
-
-    output reg Branch;
+    
+    
+    
     output reg RegWrite;
     output reg MemRead;
     output reg MemWrite;
@@ -29,6 +30,9 @@ module Control(OpCode,
     output reg [1:0] MemtoReg;
     output reg [1:0] RegDst;
     output reg [1:0] PCSource;
+    
+    output reg [2:0] ALUOp;
+    output reg [2:0] Branch;
     
     // MIPS Opcodes
     parameter LW_OP  = 6'h23; // load word(I)
@@ -42,12 +46,12 @@ module Control(OpCode,
     parameter SLTI_OP  = 6'h0a; // set on less than immediate(I)
     parameter SLTIU_OP = 6'h0b; // set on less than immediate unsigned #! u(I)
     
-    parameter BEQ_OP = 6'h04; // branch on equal(I)
-    parameter BNE_OP = 6'h05; // branch on not equal(I)
-    parameter BLEZ_OP = 6'h06; // branch on <=0(I)
+    parameter BEQ_OP  = 6'h04; // branch on equal(I)
+    parameter BNE_OP  = 6'h05; // branch on not equal(I)
+    parameter BLEZ_OP = 6'h06; // branch on < = 0(I)
     parameter BGTZ_OP = 6'h07; // branch on >0(I)
     parameter BLTZ_OP = 6'h08; // branch on <0(I)
-
+    
     parameter J_OP   = 6'h02; // jump(J)
     parameter JAL_OP = 6'h03; // jump and link(J)
     
@@ -55,9 +59,9 @@ module Control(OpCode,
     
     // MIPS Functs
     parameter ADD_FUN  = 6'h20;
-    parameter ADDU_FUN = 6'h21; 
+    parameter ADDU_FUN = 6'h21;
     parameter SUB_FUN  = 6'h22;
-    parameter SUBU_FUN = 6'h23; 
+    parameter SUBU_FUN = 6'h23;
     
     parameter AND_FUN = 6'h24;
     parameter OR_FUN  = 6'h25;
@@ -74,7 +78,7 @@ module Control(OpCode,
     parameter JALR_FUN = 6'h09;
     
     initial begin
-        PCSource    <= 0;
+        PCSource <= 0;
         Branch   <= 0;
         RegWrite <= 0;
         RegDst   <= 0;
@@ -84,13 +88,14 @@ module Control(OpCode,
         ALUSrcA  <= 0;
         ALUSrcB  <= 0;
         ExtOp    <= 0;
-        LuiOp     <= 0;
+        LuiOp    <= 0;
     end
     
+    // generate control signals
     always @(*) begin
         // PCSource
         case(OpCode)
-            J_OP,JAL_OP: begin 
+            J_OP,JAL_OP: begin
                 PCSource <= 2'b01; // from imm
             end
             
@@ -112,12 +117,28 @@ module Control(OpCode,
         
         // Branch
         case(OpCode)
-            BEQ_OP,BNE_OP,BLEZ_OP,BGTZ_OP,BLTZ_OP:begin
-                Branch <= 1'b1;
+            BEQ_OP:begin
+                Branch <= 3'b001;
+            end
+
+            BNE_OP:begin
+                Branch <= 3'b010;
+            end
+
+            BLEZ_OP:begin
+                Branch <= 3'b011;
+            end
+
+            BGTZ_OP:begin
+                Branch <= 3'b100;
+            end
+
+            BLTZ_OP:begin
+                Branch <= 3'b101;
             end
             
             default:begin
-                Branch <= 1'b0;
+                Branch <= 3'b000;
             end
         endcase
         
@@ -196,7 +217,7 @@ module Control(OpCode,
             JAL_OP:begin
                 MemtoReg <= 2'b10;
             end
-
+            
             LUI_OP:begin
                 MemtoReg <= 2'b11;
             end
@@ -268,4 +289,22 @@ module Control(OpCode,
             end
         endcase
     end
+    
+    // generate ALUOp
+    parameter I1_ALUOP  = 3'b000; // I type: lw,sw(use add)
+    parameter I2_ALUOP  = 3'b001; // I type: beq(use sub)
+    parameter R_ALUOP   = 3'b010; // R type
+    parameter AND_ALUOP = 3'b011; // andi
+    parameter SLT_ALUOP = 3'b100; // slti, sltiu
+    
+    always @(*) begin
+        case(OpCode)
+            LW_OP,SW_OP,LUI_OP,ADDI_OP,ADDIU_OP:ALUOp <= I1_ALUOP;
+            BEQ_OP,BNE_OP,BLEZ_OP,BGTZ_OP,BLTZ_OP:ALUOp <= I2_ALUOP;
+            ANDI_OP:ALUOp <= AND_ALUOP;
+            SLTI_OP,SLTIU_OP:ALUOp <= SLT_ALUOP;
+            default:ALUOp <= R_ALUOP;
+        endcase
+    end
+    
 endmodule

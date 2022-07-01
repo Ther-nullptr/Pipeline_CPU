@@ -45,16 +45,17 @@ module ID_EX_Register(reset,
     input i_mem_write;
     input i_alu_src_a;
     input i_alu_src_b;
-    input i_branch;
-    input i_pc_4;
-    input i_data_1;
-    input i_data_2;
+    
     input [1:0] i_mem_to_reg;
     input [1:0] i_reg_dst;
+    input [2:0] i_branch;
     input [3:0] i_alu_op;
     input [5:0] i_rs;
     input [5:0] i_rt;
     input [5:0] i_rd;
+    input [31:0] i_pc_4;
+    input [31:0] i_data_1;
+    input [31:0] i_data_2;
     input [31:0] i_imm_ext;
     input [31:0] i_imm_ext_shift;
     
@@ -63,16 +64,18 @@ module ID_EX_Register(reset,
     output reg o_mem_write;
     output reg o_alu_src_a;
     output reg o_alu_src_b;
-    output reg o_branch;
-    output reg o_pc_4;
-    output reg o_data_1;
-    output reg o_data_2;
+    
+
     output reg [1:0] o_mem_to_reg;
     output reg [1:0] o_reg_dst;
+    output reg [2:0] o_branch;
     output reg [3:0] o_alu_op;
     output reg [5:0] o_rs;
     output reg [5:0] o_rt;
     output reg [5:0] o_rd;
+    output reg [31:0] o_pc_4;
+    output reg [31:0] o_data_1;
+    output reg [31:0] o_data_2;
     output reg [31:0] o_imm_ext;
     output reg [31:0] o_imm_ext_shift;
     
@@ -104,7 +107,7 @@ module ID_EX_Register(reset,
             end
             else begin
                 o_reg_write <= i_reg_write;
-                o_mem_write <= o_mem_write;
+                o_mem_write <= i_mem_write;
             end
             
             o_mem_read      <= i_mem_read;

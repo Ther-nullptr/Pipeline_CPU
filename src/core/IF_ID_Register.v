@@ -30,6 +30,4 @@ module IF_ID_Register(reset,
         end
 
     end
-    
-    
 endmodule
