@@ -19,6 +19,7 @@ module ID_EX_Register(reset,
                       i_rs,
                       i_rt,
                       i_rd,
+                      i_shamt,
                       o_reg_write,
                       o_mem_to_reg,
                       o_mem_read,
@@ -36,6 +37,7 @@ module ID_EX_Register(reset,
                       o_rs,
                       o_rt,
                       o_rd,
+                      o_shamt
                       );
     input reset;
     input clk;
@@ -51,9 +53,11 @@ module ID_EX_Register(reset,
     input [1:0] i_reg_dst;
     input [2:0] i_branch;
     input [3:0] i_alu_op;
-    input [5:0] i_rs;
-    input [5:0] i_rt;
-    input [5:0] i_rd;
+    input [4:0] i_shamt;
+    input [4:0] i_rs;
+    input [4:0] i_rt;
+    input [4:0] i_rd;
+    input [5:0] i_funct;
     input [31:0] i_pc_4;
     input [31:0] i_data_1;
     input [31:0] i_data_2;
@@ -70,9 +74,11 @@ module ID_EX_Register(reset,
     output reg [1:0] o_reg_dst;
     output reg [2:0] o_branch;
     output reg [3:0] o_alu_op;
-    output reg [5:0] o_rs;
-    output reg [5:0] o_rt;
-    output reg [5:0] o_rd;
+    output reg [4:0] o_shamt;
+    output reg [4:0] o_rs;
+    output reg [4:0] o_rt;
+    output reg [4:0] o_rd;
+    output reg [5:0] o_funct;
     output reg [31:0] o_pc_4;
     output reg [31:0] o_data_1;
     output reg [31:0] o_data_2;
@@ -97,6 +103,8 @@ module ID_EX_Register(reset,
             o_rs            <= 0;
             o_rt            <= 0;
             o_rd            <= 0;
+            o_shamt         <= 0;
+            o_funct         <= 0;
             o_imm_ext       <= 0;
             o_imm_ext_shift <= 0;
         end
@@ -123,6 +131,8 @@ module ID_EX_Register(reset,
             o_rs            <= i_rs;
             o_rt            <= i_rt;
             o_rd            <= i_rd;
+            o_shamt         <= i_shamt;
+            o_funct         <= i_funct;
             o_imm_ext       <= i_imm_ext;
             o_imm_ext_shift <= i_imm_ext_shift;
         end

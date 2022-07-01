@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 module PC(reset,
           clk,
-          i_pc_write,
+          i_pc_keep,
           i_pc,
           o_pc);
     
@@ -10,7 +10,7 @@ module PC(reset,
     input clk;
     
     //Input Control
-    input i_pc_write;
+    input i_pc_keep;
     
     //Input PC
     input [31:0] i_pc;
@@ -25,11 +25,11 @@ module PC(reset,
         if (reset) begin
             o_pc <= 0;
         end
-        else if (i_pc_write) begin
-            o_pc <= i_pc;
+        else if (i_pc_keep) begin
+            o_pc <= o_pc;
         end
         else begin
-            o_pc <= o_pc;
+            o_pc <= i_pc;
         end
     end
     

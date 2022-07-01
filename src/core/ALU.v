@@ -1,22 +1,22 @@
 `timescale 1ns / 1ps
-module ALU(ALUConf,
-           Sign,
-           in1,
-           in2,
-           relation,
-           result);
+module ALU(i_alu_conf,
+           i_sign,
+           i_data_1,
+           i_data_2,
+           o_relation,
+           o_result);
     
     // Control Signals
-    input [4:0] ALUConf;
-    input Sign;
+    input [4:0] i_alu_conf;
+    input i_sign;
     // Input Data Signals
-    input [31:0] in1;
-    input [31:0] in2;
+    input [31:0] i_data_1;
+    input [31:0] i_data_2;
     // Result output
-    output reg [1:0] relation;
-    output reg [31:0] result;
+    output reg [1:0] o_relation;
+    output reg [31:0] o_result;
     
-    // ALUConf signal
+    // i_alu_conf signal
     parameter AND_CONF = 4'b0000; // &
     parameter OR_CONF  = 4'b0001; // |
     parameter ADD_CONF = 4'b0010; // +
@@ -30,45 +30,45 @@ module ALU(ALUConf,
     
     // useful for branch control
     always @(*) begin
-        if (result < 0)begin
-            relation <= 2'b00; // <
+        if (o_result < 0)begin
+            o_relation <= 2'b00; // <
         end
-        else if (result > 0)begin
-            relation <= 2'b01; // >
+        else if (o_result > 0)begin
+            o_relation <= 2'b01; // >
         end
         else begin
-            relation <= 2'b10; // = 
+            o_relation <= 2'b10; // = 
         end
     end
     
     // IMPORTANT! although the signed and unsigned settings has different results in +,-,&,|..., but they share the same representations
-    // However, when it comes to slt and sra, they will produce different result performance
+    // However, when it comes to slt and sra, they will produce different o_result performance
     always @(*) begin
-        case(ALUConf)
-            AND_CONF: result <= in1 & in2;
-            OR_CONF: result  <= in1 | in2;
-            ADD_CONF: result <= in1 + in2;
-            SUB_CONF: result <= in1 - in2;
+        case(i_alu_conf)
+            AND_CONF: o_result <= i_data_1 & i_data_2;
+            OR_CONF: o_result  <= i_data_1 | i_data_2;
+            ADD_CONF: o_result <= i_data_1 + i_data_2;
+            SUB_CONF: o_result <= i_data_1 - i_data_2;
             SLT_CONF: begin
-                if (Sign) begin //signed
-                    case({in1[31],in2[31]}) // to compare according to the sign bit
-                        2'b01: result <= 0;
-                        2'b10: result <= 1;
-                        2'b00: result <= (in1<in2);
-                        2'b11: result <= (in1[30:0]<in2[30:0]);
+                if (i_sign) begin //signed
+                    case({i_data_1[31],i_data_2[31]}) // to compare according to the sign bit
+                        2'b01: o_result <= 0;
+                        2'b10: o_result <= 1;
+                        2'b00: o_result <= (i_data_1<i_data_2);
+                        2'b11: o_result <= (i_data_1[30:0]<i_data_2[30:0]);
                     endcase
                 end
                 else // unsigned
-                result <= (in1 < in2);
+                o_result <= (i_data_1 < i_data_2);
             end
-            NOR_CONF: result <= ~(in1 | in2);
-            XOR_CONF: result <= (in1 ^ in2);
-            SLL_CONF: result <= (in2 << in1);
-            SRL_CONF: result <= (in2 >> in1);
+            NOR_CONF: o_result <= ~(i_data_1 | i_data_2);
+            XOR_CONF: o_result <= (i_data_1 ^ i_data_2);
+            SLL_CONF: o_result <= (i_data_2 << i_data_1);
+            SRL_CONF: o_result <= (i_data_2 >> i_data_1);
             // important!! if you want to add shamt options, you should load the last 16 bits and get the shamt[10:6]
-            SRA_CONF: result <= ({{32{in2[31]}}, in2} >> in1); // the highst bit is always same as signal-bit
+            SRA_CONF: o_result <= ({{32{i_data_2[31]}}, i_data_2} >> i_data_1); // the highst bit is always same as signal-bit
             // when it comes to unsigned numbers, sra_ctrl may get wrong answers
-            default: result <= 0;
+            default: o_result <= 0;
         endcase
     end
 endmodule
