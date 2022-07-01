@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module MEM_Forward(i_EX_MEM_Rt,
                    i_MEM_WB_Rt,
                    i_EX_MEM_mem_write,

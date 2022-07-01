@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module ALU(ALUConf,
            Sign,
            in1,

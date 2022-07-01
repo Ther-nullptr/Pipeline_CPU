@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module RegisterFile(reset,
                     clk,
                     i_reg_write,

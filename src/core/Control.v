@@ -17,8 +17,6 @@ module Control(OpCode,
     input [5:0] OpCode;
     input [5:0] Funct;
     
-    
-    
     output reg RegWrite;
     output reg MemRead;
     output reg MemWrite;

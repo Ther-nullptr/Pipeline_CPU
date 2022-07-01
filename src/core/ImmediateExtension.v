@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module ImmediateExtension(i_extop,
                           i_luiop,
                           i_immediate,

@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module ID_EX_Register(reset,
                       clk,
                       i_flush,
@@ -64,7 +65,6 @@ module ID_EX_Register(reset,
     output reg o_mem_write;
     output reg o_alu_src_a;
     output reg o_alu_src_b;
-    
 
     output reg [1:0] o_mem_to_reg;
     output reg [1:0] o_reg_dst;

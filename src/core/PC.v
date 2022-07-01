@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module PC(reset,
           clk,
           i_pc_write,

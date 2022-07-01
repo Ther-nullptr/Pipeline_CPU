@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module EX_Forward(i_ID_EX_Rs,
                   i_ID_EX_Rt,
                   i_EX_MEM_Rd,

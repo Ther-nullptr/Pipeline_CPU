@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module BranchControl(i_relation,
                      i_branch,
                      o_branch);
