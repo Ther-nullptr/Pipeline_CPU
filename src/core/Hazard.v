@@ -14,9 +14,9 @@ module Hazard(
     input i_ID_EX_mem_read;
     input i_jump;
     input [2:0] i_branch;
-    input [5:0] i_ID_EX_Rt;
-    input [5:0] i_IF_ID_Rs;
-    input [5:0] i_IF_ID_Rt;
+    input [4:0] i_ID_EX_Rt;
+    input [4:0] i_IF_ID_Rs;
+    input [4:0] i_IF_ID_Rt;
     output o_IF_ID_flush;
     output o_ID_EX_flush;
     output o_IF_ID_keep;

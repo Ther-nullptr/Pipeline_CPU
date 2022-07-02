@@ -20,6 +20,7 @@ module ID_EX_Register(reset,
                       i_rt,
                       i_rd,
                       i_shamt,
+                      i_funct,
                       o_reg_write,
                       o_mem_to_reg,
                       o_mem_read,
@@ -37,7 +38,8 @@ module ID_EX_Register(reset,
                       o_rs,
                       o_rt,
                       o_rd,
-                      o_shamt
+                      o_shamt,
+                      o_funct
                       );
     input reset;
     input clk;
@@ -52,7 +54,7 @@ module ID_EX_Register(reset,
     input [1:0] i_mem_to_reg;
     input [1:0] i_reg_dst;
     input [2:0] i_branch;
-    input [3:0] i_alu_op;
+    input [2:0] i_alu_op;
     input [4:0] i_shamt;
     input [4:0] i_rs;
     input [4:0] i_rt;
@@ -73,7 +75,7 @@ module ID_EX_Register(reset,
     output reg [1:0] o_mem_to_reg;
     output reg [1:0] o_reg_dst;
     output reg [2:0] o_branch;
-    output reg [3:0] o_alu_op;
+    output reg [2:0] o_alu_op;
     output reg [4:0] o_shamt;
     output reg [4:0] o_rs;
     output reg [4:0] o_rt;

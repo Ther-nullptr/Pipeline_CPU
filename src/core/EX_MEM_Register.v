@@ -31,9 +31,9 @@ module EX_MEM_Register(reset,
     input i_mem_write;
     
     input [1:0] i_mem_to_reg;
-    input [5:0] i_write_register;
-    input [5:0] i_rt;
-    input [5:0] i_rd;
+    input [4:0] i_write_register;
+    input [4:0] i_rt;
+    input [4:0] i_rd;
     input [31:0] i_pc_4;
     input [31:0] i_data_2;
     input [31:0] i_imm_ext;
@@ -43,9 +43,9 @@ module EX_MEM_Register(reset,
     output reg o_mem_read;
     output reg o_mem_write;
     output reg [1:0] o_mem_to_reg;
-    output reg [5:0] o_write_register;
-    output reg [5:0] o_rt;
-    output reg [5:0] o_rd;
+    output reg [4:0] o_write_register;
+    output reg [4:0] o_rt;
+    output reg [4:0] o_rd;
     output reg [31:0] o_pc_4;
     output reg [31:0] o_data_2;
     output reg [31:0] o_imm_ext;

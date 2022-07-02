@@ -7,7 +7,7 @@ module ALU(i_alu_conf,
            o_result);
     
     // Control Signals
-    input [4:0] i_alu_conf;
+    input [3:0] i_alu_conf;
     input i_sign;
     // Input Data Signals
     input [31:0] i_data_1;

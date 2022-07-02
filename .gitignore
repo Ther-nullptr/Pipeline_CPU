@@ -1,3 +1,5 @@
 reference/
 MIPS32_pipeline/
 report/
+
+*.out

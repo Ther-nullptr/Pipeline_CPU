@@ -10,10 +10,10 @@ module EX_Forward(i_ID_EX_Rs,
 
     input i_EX_MEM_reg_write;
     input i_MEM_WB_reg_write;
-    input [5:0] i_ID_EX_Rs;
-    input [5:0] i_ID_EX_Rt;
-    input [5:0] i_EX_MEM_Rd;
-    input [5:0] i_MEM_WB_Rd;
+    input [4:0] i_ID_EX_Rs;
+    input [4:0] i_ID_EX_Rt;
+    input [4:0] i_EX_MEM_Rd;
+    input [4:0] i_MEM_WB_Rd;
     
     output [1:0] o_forward_A;
     output [1:0] o_forward_B;

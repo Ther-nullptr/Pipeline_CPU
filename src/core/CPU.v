@@ -1,15 +1,22 @@
 `timescale 1ns / 1ps
 
 // only useful in vscode:
-`include "src/core/CPU.v"
-`include "src/core/InstructionMemory.v"
-`include "src/core/IF_ID_Register.v"
-`include "src/core/RegisterFile.v"
-`include "src/core/Control.v"
-`include "src/core/ImmediateExtension.v"
-`include "src/core/Hazard.v"
-`include "src/core/ID_EX_Register.v"
-`include "src/core/ALUControl.v"
+`include "InstructionMemory.v"
+`include "PC.v"
+`include "IF_ID_Register.v"
+`include "RegisterFile.v"
+`include "Control.v"
+`include "ImmediateExtension.v"
+`include "Hazard.v"
+`include "ID_EX_Register.v"
+`include "ALUControl.v"
+`include "ALU.v"
+`include "BranchControl.v"
+`include "EX_Forward.v"
+`include "EX_MEM_Register.v"
+`include "DataMemory.v"
+`include "MEM_Forward.v"
+`include "MEM_WB_Register.v"
 
 module CPU(reset,
            clk);
@@ -92,10 +99,10 @@ module CPU(reset,
     assign rd_ID          = instruction_ID[15:11];
     assign shamt_ID       = instruction_ID[10:6];
     assign funct_ID       = instruction_ID[5:0];
-    assign immediate_ID   = {rd_ID,shamt_ID,funct};
+    assign immediate_ID   = {rd_ID,shamt_ID,funct_ID};
     assign imm_address_ID = {rs_ID,rt_ID,immediate_ID};
     
-    wire [5:0] write_register_WB;
+    wire [4:0] write_register_WB;
     wire [31:0] write_register_data_WB;
     wire [31:0] read_data_1_ID;
     wire [31:0] read_data_2_ID;
@@ -103,7 +110,7 @@ module CPU(reset,
     /* module:Control */
     Control U_Control(
     .OpCode(opcode),
-    .Funct(funct),
+    .Funct(funct_ID),
     .PCSource(pc_source_ID),
     .Branch(branch_ID),
     .RegWrite(reg_write_ID),
@@ -237,12 +244,12 @@ module CPU(reset,
     );
     
     //-------------------EX-------------------
-    wire [5:0] alu_conf;
+    wire [3:0] alu_conf;
     wire sign;
     
     /* module:ALU Control*/
     ALUControl U_ALUControl(
-    .i_alu_op(alu_op_EX),
+    .i_aluop(alu_op_EX),
     .i_funct(funct_EX),
     .o_aluconf(alu_conf),
     .o_sign(sign)
@@ -261,7 +268,7 @@ module CPU(reset,
     .i_data_1(alu_in1),
     .i_data_2(alu_in2),
     .o_relation(relation),
-    .o_result(alu_out)
+    .o_result(alu_out_EX)
     );
     
     /* module: BranchControl*/
@@ -270,6 +277,14 @@ module CPU(reset,
     .i_branch(branch_EX),
     .o_branch(branch_final)
     );
+    
+    wire [4:0] rd_MEM;
+    wire [4:0] rd_WB;
+    
+    wire reg_write_MEM;
+    wire reg_write_WB;
+    wire [1:0] forward_A_EX;
+    wire [1:0] forward_B_EX;
     
     /* module: EX Forward Unit*/
     EX_Forward U_EX_Forward(
@@ -286,7 +301,19 @@ module CPU(reset,
     // generate branch address
     wire [31:0] branch_address;
     assign branch_address = pc_EX+imm_ext_shift_EX;
-    
+
+    wire mem_read_MEM;
+    wire mem_write_MEM;
+    wire [1:0] mem_to_reg_MEM;
+    wire [4:0] write_register_EX;
+    wire [4:0] write_register_MEM;
+    wire [4:0] rt_MEM;
+    wire [31:0] pc_MEM;
+    wire [31:0] read_data_2_MEM;
+    wire [31:0] imm_ext_out_MEM;
+    wire [31:0] alu_out_MEM;
+
+
     /* module:EX/MEM Reg*/
     EX_MEM_Register U_EX_MEM_Register(
     .reset(reset),
@@ -319,25 +346,35 @@ module CPU(reset,
     
     //-------------------MEM------------------
     wire [31:0] mem_read_data_MEM;
-
+    wire [31:0] mem_write_data;
     /* module:Data Memory*/
     DataMemory U_DataMemory(
     .reset(reset),
     .clk(clk),
     .i_address(alu_out_MEM),
-    .i_mem_write_data(mem_write_MEM),
+    .i_mem_write_data(mem_write_data),
     .i_mem_read(mem_read_MEM),
     .i_mem_write(mem_write_MEM),
     .o_mem_read_data(mem_read_data_MEM)
     );
 
+    wire mem_read_WB;
+    wire forward_MEM;
+    wire [4:0] rt_WB;
+    
     /* module:MEM Forward Unit*/
     MEM_Forward U_MEM_Forward(.i_EX_MEM_Rt(rt_MEM),
-                   .i_MEM_WB_Rt(rt_WB),
-                   .i_EX_MEM_mem_write(mem_write_MEM),
-                   .i_MEM_WB_mem_read(mem_read_WB),
-                   .o_forward(forward_MEM)); // TODO
+    .i_MEM_WB_Rt(rt_WB),
+    .i_EX_MEM_mem_write(mem_write_MEM),
+    .i_MEM_WB_mem_read(mem_read_WB),
+    .o_forward(forward_MEM)); // TODO
 
+    wire [1:0] mem_to_reg_WB;
+    wire [31:0] alu_out_WB;
+    wire [31:0] mem_read_data_WB;
+    wire [31:0] pc_WB;
+    wire [31:0] imm_ext_out_WB;
+    
     /* module:MEM/WB Reg*/
     MEM_WB_Register U_MEM_WB_Register(
     .reset(reset),
@@ -355,7 +392,7 @@ module CPU(reset,
     .o_reg_write(reg_write_WB),
     .o_mem_to_reg(mem_to_reg_WB)
     );
-
+    
     /* mux */
     
     //-------------------WB-------------------
