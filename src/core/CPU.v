@@ -299,7 +299,7 @@ module CPU(reset,
     // generate branch address
     wire [31:0] branch_address;
     assign branch_address = pc_EX+imm_ext_shift_EX;
-
+    
     wire mem_read_MEM;
     wire mem_write_MEM;
     wire [1:0] mem_to_reg_MEM;
@@ -310,7 +310,7 @@ module CPU(reset,
     wire [31:0] read_data_2_MEM;
     wire [31:0] imm_ext_out_MEM;
     wire [31:0] alu_out_MEM;
-
+    
     /* module:EX/MEM Reg*/
     EX_MEM_Register U_EX_MEM_Register(
     .reset(reset),
@@ -340,25 +340,25 @@ module CPU(reset,
     );
     
     /* mux */
-
+    
     assign write_register_EX = (reg_dst_EX == 2'b00)?rt_EX:
-                               (reg_dst_EX == 2'b01)?rd_EX:
-                               (reg_dst_EX == 2'b10)?5'b11111:
-                               rt_EX;
-
+    (reg_dst_EX == 2'b01)?rd_EX:
+    (reg_dst_EX == 2'b10)?5'b11111:
+    rt_EX;
+    
     wire [31:0] w_result_1;
     wire [31:0] w_result_2;
-
+    
     assign w_result_1 = (forward_A_EX == 2'b00)?read_data_1_EX:
-                        (forward_A_EX == 2'b01)?alu_out_MEM:
-                        (forward_A_EX == 2'b10)?write_register_data_WB:
-                        read_data_1_EX;
-
+    (forward_A_EX == 2'b01)?alu_out_MEM:
+    (forward_A_EX == 2'b10)?write_register_data_WB:
+    read_data_1_EX;
+    
     assign w_result_2 = (forward_B_EX == 2'b00)?read_data_2_EX:
-                        (forward_B_EX == 2'b01)?alu_out_MEM:
-                        (forward_B_EX == 2'b10)?write_register_data_WB:
-                        read_data_2_EX;
-
+    (forward_B_EX == 2'b01)?alu_out_MEM:
+    (forward_B_EX == 2'b10)?write_register_data_WB:
+    read_data_2_EX;
+    
     assign alu_in1 = (alu_src_a_EX == 0)?w_result_1:shamt_EX;
     assign alu_in2 = (alu_src_b_EX == 0)?w_result_2:imm_ext_out_EX;
     
@@ -375,7 +375,7 @@ module CPU(reset,
     .i_mem_write(mem_write_MEM),
     .o_mem_read_data(mem_read_data_MEM)
     );
-
+    
     wire mem_read_WB;
     wire forward_MEM;
     wire [4:0] rt_WB;
@@ -385,8 +385,8 @@ module CPU(reset,
     .i_MEM_WB_Rt(rt_WB),
     .i_EX_MEM_mem_write(mem_write_MEM),
     .i_MEM_WB_mem_read(mem_read_WB),
-    .o_forward(forward_MEM)); // TODO
-
+    .o_forward(forward_MEM));
+    
     wire [1:0] mem_to_reg_WB;
     wire [31:0] alu_out_WB;
     wire [31:0] mem_read_data_WB;
@@ -403,32 +403,34 @@ module CPU(reset,
     .i_imm_ext_out(imm_ext_out_MEM),
     .i_reg_write(reg_write_MEM),
     .i_mem_to_reg(mem_to_reg_MEM),
+    .i_mem_read(mem_read_MEM),
     .o_result(alu_out_WB),
     .o_mem_read_data(mem_read_data_WB),
     .o_pc_4(pc_WB),
     .o_imm_ext_out(imm_ext_out_WB),
     .o_reg_write(reg_write_WB),
-    .o_mem_to_reg(mem_to_reg_WB)
+    .o_mem_to_reg(mem_to_reg_WB),
+    .o_mem_read(mem_read_WB)
     );
     
     /* mux */
     assign mem_write_data = (forward_MEM == 0)?read_data_2_MEM:write_register_data_WB;
     
     //-------------------WB-------------------
-
+    
     /* mux */
     assign write_register_data_WB = (mem_to_reg_WB == 2'b00)?alu_out_WB:
-                                    (mem_to_reg_WB == 2'b01)?mem_read_data_WB:
-                                    (mem_to_reg_WB == 2'b10)?pc_WB:
-                                    (mem_to_reg_WB == 2'b11)?imm_ext_out_WB:
-                                    alu_out_WB;
-
+    (mem_to_reg_WB == 2'b01)?mem_read_data_WB:
+    (mem_to_reg_WB == 2'b10)?pc_WB:
+    (mem_to_reg_WB == 2'b11)?imm_ext_out_WB:
+    alu_out_WB;
+    
     wire [31:0] w_pc;
     assign w_pc = (pc_source_ID == 2'b00)?pc_IF:
-                  (pc_source_ID == 2'b01)?jump_address:
-                  (pc_source_ID == 2'b10)?read_data_1_ID:
-                  pc_IF;
-
+    (pc_source_ID == 2'b01)?jump_address:
+    (pc_source_ID == 2'b10)?read_data_1_ID:
+    pc_IF;
+    
     assign i_pc = (branch_final == 0)?w_pc:branch_address;
     
 endmodule
