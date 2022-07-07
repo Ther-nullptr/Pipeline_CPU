@@ -16,19 +16,128 @@
 \hypersetup{unicode, colorlinks=true, linkcolor=black, urlcolor=black}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{color}
+\usepackage{listings}
 
+\definecolor{vgreen}{RGB}{104,180,104}
+\definecolor{vblue}{RGB}{49,49,255}
+\definecolor{vorange}{RGB}{255,143,102}
+
+\lstset{ %
+  language=verilog,                % the language of the code
+  basicstyle=\footnotesize,           % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  stepnumber=2,                   % the step between two line-numbers. If it's 1, each line 
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                   % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},          % keyword style
+  commentstyle=\color{dkgreen},       % comment style
+  stringstyle=\color{mauve},         % string literal style
+  escapeinside={\%*}{*)},            % if you want to add LaTeX within your code
+  morekeywords={*,...}               % if you want to add more keywords to the set
+}
 
 \begin{document}
 
-\definecolor{bg}{rgb}{0.95,0.95,0.95}
+% \definecolor{bg}{rgb}{0.98,0.98,0.98}
 
-\title{\textbf{流水线MIPS处理器设计}\\——夏季学期综合实验报告}
+\title{\textbf{流水线CPU处理器设计}}
 \author{无03\quad 王与进 \quad2020010708}
 \date{}
+
 \maketitle
 
 \tableofcontents
 
 \newpage
+
+\section{设计总览}
+
+% \begin{figure}[ht]
+%     \centering
+%     \includegraphics[width=.8\textwidth]{../assets/design.png}
+%     \caption{流水线总设计图}
+%     \label{fig:总设计}
+% \end{figure}
+
+\section{实现细节}
+
+\subsection{流水线阶段}
+
+\subsubsection{流水线分段介绍——$\mathbf{IF}$}
+
+\subsubsection{流水线分段介绍——$\mathbf{ID}$}
+
+\subsubsection{流水线分段介绍——$\mathbf{EX}$}
+
+\subsubsection{流水线分段介绍——$\mathbf{MEM}$}
+
+\subsubsection{流水线分段介绍——$\mathbf{WB}$}
+
+\subsection{冒险处理}
+
+\subsection{外设}
+
+\begin{lstlisting}[language=Verilog]      
+    `timescale 1ns/1ps
+    // Synchronous addition counter
+    module sac10 (clk, rstn, count);
+    input clk;
+    input rstn;
+    output reg [3:0] count;
+    
+    always @(posedge clk or posedge rstn) begin
+        if(rstn)
+            count <= 0;
+        else if(count == 4'd9)
+            count <= 0;
+        else
+            count <= count + 1;
+    end
+    endmodule //sac10
+    
+    
+    module top (sys_clk, clk, an, ano, rstn, leds);
+    input sys_clk, clk, rstn;
+    input an;
+    output ano;
+    output [6:0] leds;
+    wire [3:0] count;
+    wire clk_o;
+    
+    assign ano = an;
+    
+    debounce debounce_instance(.clk(sys_clk),.key_i(clk),.key_o(clk_o));
+    sac10 sac10_instance(.clk(clk_o),.rstn(rstn),.count(count));
+    BCD7 bcd_instance(.din(count),.dout(leds));
+    
+    endmodule //top
+\end{lstlisting}
+    
+
+\section{实验总结}
+\begin{enumerate}
+    \item \textbf{1}
+    \item \textbf{2}
+\end{enumerate}
+    
+\subsection{串口}
+
+\newpage
+
+\appendix
 
 \end{document}

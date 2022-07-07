@@ -3,3 +3,6 @@ MIPS32_pipeline/
 report/
 
 *.out
+*.fdb_latexmk
+*.fls
+*.log

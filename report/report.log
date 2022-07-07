@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2020.11.8)  30 JUN 2022 12:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2020.11.8)  5 JUL 2022 00:13
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -572,39 +572,58 @@ Package: multirow 2019/05/31 v2.5 Span multiple rows of a table
 \multirow@cntb=\count314
 \multirow@dima=\skip78
 \bigstrutjot=\dimen191
-) (e:/texlive/2020/texmf-dist/tex/latex/xcolor/xcolor.sty
-Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+) (e:/texlive/2020/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2019/11/23 v1.2a Standard LaTeX Color (DPC)
  (e:/texlive/2020/texmf-dist/tex/latex/graphics-cfg/color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
-Package xcolor Info: Driver file: pdftex.def on input line 225.
-Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
-Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
-Package xcolor Info: Model `RGB' extended on input line 1364.
-Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
-Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
-Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
-Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
-Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
-Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+Package color Info: Driver file: pdftex.def on input line 147.
+) (e:/texlive/2020/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count315
+\lst@gtempboxa=\box63
+\lst@token=\toks25
+\lst@length=\count316
+\lst@currlwidth=\dimen192
+\lst@column=\count317
+\lst@pos=\count318
+\lst@lostspace=\dimen193
+\lst@width=\dimen194
+\lst@newlines=\count319
+\lst@lineno=\count320
+\lst@maxwidth=\dimen195
+ (e:/texlive/2020/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
+\c@lstnumber=\count321
+\lst@skipnumbers=\count322
+\lst@framebox=\box64
+) (e:/texlive/2020/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2020/03/24 1.8d listings configuration
+))
+Package: listings 2020/03/24 1.8d (Carsten Heinz)
+ (e:/texlive/2020/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2020/03/24 1.8d listings language file
+) (e:/texlive/2020/texmf-dist/tex/latex/listings/lstlang2.sty
+File: lstlang2.sty 2020/03/24 1.8d listings language file
+) (e:/texlive/2020/texmf-dist/tex/latex/listings/lstlang3.sty
+File: lstlang3.sty 2020/03/24 1.8d listings language file
 )
 runsystem(for ^%i in (pygmentize.exe pygmentize.bat pygmentize.cmd) do set > report.aex <nul: /p x=^%~$PATH:i>> report.aex)...disabled (restricted).
 
 
-./report.tex:21: Emergency stop.
+./report.tex:53: Emergency stop.
 <read 3> 
          
-l.21 \begin{document}
+l.53 \begin{document}
                      ^^M
 *** (cannot \read from terminal in nonstop modes)
 
  
 Here is how much of TeX's memory you used:
- 16042 strings out of 480608
- 264366 string characters out of 5907536
- 576818 words of memory out of 5000000
- 31654 multiletter control sequences out of 15000+600000
+ 16858 strings out of 480608
+ 278236 string characters out of 5907536
+ 779715 words of memory out of 5000000
+ 32450 multiletter control sequences out of 15000+600000
  533045 words of font info for 27 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 46i,0n,52p,846b,150s stack positions out of 5000i,500n,10000p,200000b,80000s
-./report.tex:21:  ==> Fatal error occurred, no output PDF file produced!
+ 46i,0n,52p,846b,217s stack positions out of 5000i,500n,10000p,200000b,80000s
+./report.tex:53:  ==> Fatal error occurred, no output PDF file produced!
