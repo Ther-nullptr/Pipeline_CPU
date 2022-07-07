@@ -23,10 +23,10 @@ module Control(OpCode,
     output reg MemWrite;
     output reg ALUSrcA;
     output reg ALUSrcB;
-    output reg Jump;
     output reg ExtOp;
     output reg LuiOp;
     
+    output reg [1:0] Jump;
     output reg [1:0] MemtoReg;
     output reg [1:0] RegDst;
     output reg [1:0] PCSource;
@@ -270,22 +270,22 @@ module Control(OpCode,
         // Jump
         case(OpCode)
             J_OP,JAL_OP:begin
-                Jump <= 1;
+                Jump <= 2'b01;
             end
 
             R_OP:begin
                 case(Funct)
                 JR_FUN,JALR_FUN:begin
-                    Jump <= 1;
+                    Jump <= 2'b10;
                 end
                 default:begin
-                    Jump <= 0;
+                    Jump <= 2'b00;
                 end
                 endcase
             end
 
             default:begin
-                Jump <= 0;
+                Jump <= 2'b00;
             end
         endcase
         

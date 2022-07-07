@@ -1,27 +1,13 @@
 `timescale 1ns / 1ps
 
-// only useful in vscode:
-`include "InstructionMemory.v"
-`include "PC.v"
-`include "IF_ID_Register.v"
-`include "RegisterFile.v"
-`include "Control.v"
-`include "ImmediateExtension.v"
-`include "Hazard.v"
-`include "ID_EX_Register.v"
-`include "ALUControl.v"
-`include "ALU.v"
-`include "BranchControl.v"
-`include "EX_Forward.v"
-`include "EX_MEM_Register.v"
-`include "DataMemory.v"
-`include "MEM_Forward.v"
-`include "MEM_WB_Register.v"
-
 module CPU(reset,
-           clk);
+           clk,
+           real_digital,
+           real_led);
     input reset;
     input clk;
+    output [11:0] real_digital;
+    output [7:0] real_led;
     
     //-------------------IF-------------------
     
@@ -45,7 +31,7 @@ module CPU(reset,
     
     /* module:Instruction Memory */
     InstructionMemory U_InstructionMemory(
-    .i_address(o_pc),
+    .i_address(o_pc[10:2]),
     .o_instruction(instruction_IF)
     );
     
@@ -118,8 +104,8 @@ module CPU(reset,
     .MemRead(mem_read_ID),
     .MemWrite(mem_write_ID),
     .MemtoReg(mem_to_reg_ID),
-    .ALUSrcA(alu_src1),
-    .ALUSrcB(alu_src2),
+    .ALUSrcA(alu_src_a_ID),
+    .ALUSrcB(alu_src_b_ID),
     .Jump(jump_ID),
     .ALUOp(alu_op_ID),
     .ExtOp(ext_op_ID),
@@ -154,6 +140,10 @@ module CPU(reset,
     .o_imm_ext(imm_ext_out_ID),
     .o_imm_ext_shift(imm_ext_shift_ID)
     );
+    
+    // generate branch address
+    wire [31:0] branch_address;
+    assign branch_address = pc_ID+imm_ext_shift_ID;
     
     wire flush_ID_EX;
     wire reg_write_EX;
@@ -227,8 +217,28 @@ module CPU(reset,
     .o_funct(funct_EX)
     );
     
+    wire reg_write_MEM;
+    wire reg_write_WB;
+    wire [1:0] forward_A_ID;
+    wire [1:0] forward_B_ID;
+    wire [4:0] rd_MEM;
+    wire [4:0] rd_WB;
+    
+    /* module:ID Forward Unit*/
+    ID_Forward U_ID_Forward(
+    .i_IF_ID_Rs(rs_ID),
+    .i_IF_ID_Rt(rt_ID),
+    .i_EX_MEM_Rd(rd_MEM),
+    .i_MEM_WB_Rd(rd_WB),
+    .i_EX_MEM_reg_write(reg_write_MEM),
+    .i_MEM_WB_reg_write(reg_write_WB),
+    .o_forward_A(forward_A_ID),
+    .o_forward_B(forward_B_ID)
+    );
+    
     /* module:Hazard Unit*/
     Hazard U_Hazard(
+    .reset(reset),
     .i_ID_EX_mem_read(mem_read_EX),
     .i_ID_EX_Rt(rt_EX),
     .i_IF_ID_Rs(rs_ID),
@@ -239,6 +249,27 @@ module CPU(reset,
     .o_ID_EX_flush(flush_ID_EX),
     .o_IF_ID_keep(keep_IF_ID),
     .o_pc_keep(pc_keep)
+    );
+    
+    wire branch_final;
+    wire [31:0] compare_data_1;
+    wire [31:0] compare_data_2;
+    wire [31:0] alu_out_MEM;
+    wire [31:0] mem_read_data_WB;
+    
+    assign compare_data_1 = (forward_A_ID == 2'b01)?alu_out_MEM:
+    (forward_A_ID == 2'b10)?mem_read_data_WB:
+    read_data_1_ID;
+    assign compare_data_2 = (forward_B_ID == 2'b01)?alu_out_MEM:
+    (forward_B_ID == 2'b10)?mem_read_data_WB:
+    read_data_2_ID;
+    
+    /* module:Branch Control */
+    BranchControl U_BranchControl(
+    .i_data1(compare_data_1),
+    .i_data2(compare_data_2),
+    .i_branch(branch_ID),
+    .o_branch(branch_final)
     );
     
     //-------------------EX-------------------
@@ -256,8 +287,6 @@ module CPU(reset,
     wire [31:0] alu_in1;
     wire [31:0] alu_in2;
     wire [31:0] alu_out_EX;
-    wire [1:0] relation;
-    wire branch_final;
     
     /* module:ALU */
     ALU U_ALU(
@@ -265,22 +294,9 @@ module CPU(reset,
     .i_sign(sign),
     .i_data_1(alu_in1),
     .i_data_2(alu_in2),
-    .o_relation(relation),
     .o_result(alu_out_EX)
     );
     
-    /* module: BranchControl*/
-    BranchControl U_BranchControl(
-    .i_relation(relation),
-    .i_branch(branch_EX),
-    .o_branch(branch_final)
-    );
-    
-    wire [4:0] rd_MEM;
-    wire [4:0] rd_WB;
-    
-    wire reg_write_MEM;
-    wire reg_write_WB;
     wire [1:0] forward_A_EX;
     wire [1:0] forward_B_EX;
     
@@ -296,10 +312,6 @@ module CPU(reset,
     .o_forward_B(forward_B_EX)
     );
     
-    // generate branch address
-    wire [31:0] branch_address;
-    assign branch_address = pc_EX+imm_ext_shift_EX;
-    
     wire mem_read_MEM;
     wire mem_write_MEM;
     wire [1:0] mem_to_reg_MEM;
@@ -309,7 +321,6 @@ module CPU(reset,
     wire [31:0] pc_MEM;
     wire [31:0] read_data_2_MEM;
     wire [31:0] imm_ext_out_MEM;
-    wire [31:0] alu_out_MEM;
     
     /* module:EX/MEM Reg*/
     EX_MEM_Register U_EX_MEM_Register(
@@ -365,15 +376,37 @@ module CPU(reset,
     //-------------------MEM------------------
     wire [31:0] mem_read_data_MEM;
     wire [31:0] mem_write_data;
+    
     /* module:Data Memory*/
     DataMemory U_DataMemory(
-    .reset(reset),
     .clk(clk),
     .i_address(alu_out_MEM),
     .i_mem_write_data(mem_write_data),
-    .i_mem_read(mem_read_MEM),
     .i_mem_write(mem_write_MEM),
     .o_mem_read_data(mem_read_data_MEM)
+    );
+    
+    assign mem_read_data_MEM = mem_read_MEM?mem_read_data_MEM:0;
+    
+    wire [31:0] control_read_data;
+    wire [31:0] led;
+    wire [31:0] digital;
+    
+    // data or peripheral
+    wire DorP;
+    assign DorP = (alu_out_MEM == 32'h4000000C || alu_out_MEM == 32'h40000010 || alu_out_MEM == 32'h40000014)?0:1;
+    
+    /* module:PeripheralControl*/
+    PeripheralControl U_PeripheralControl(
+    .reset(reset),
+    .clk(clk),
+    .i_address(alu_out_MEM),
+    .i_control_read(mem_read_MEM),
+    .i_control_write(mem_write_MEM),
+    .i_control_write_data(mem_write_data),
+    .o_control_read_data(control_read_data),
+    .o_led(led),
+    .o_digital(digital)
     );
     
     wire mem_read_WB;
@@ -381,15 +414,16 @@ module CPU(reset,
     wire [4:0] rt_WB;
     
     /* module:MEM Forward Unit*/
-    MEM_Forward U_MEM_Forward(.i_EX_MEM_Rt(rt_MEM),
+    MEM_Forward U_MEM_Forward(
+    .i_EX_MEM_Rt(rt_MEM),
     .i_MEM_WB_Rt(rt_WB),
     .i_EX_MEM_mem_write(mem_write_MEM),
     .i_MEM_WB_mem_read(mem_read_WB),
-    .o_forward(forward_MEM));
+    .o_forward(forward_MEM)
+    );
     
     wire [1:0] mem_to_reg_WB;
     wire [31:0] alu_out_WB;
-    wire [31:0] mem_read_data_WB;
     wire [31:0] pc_WB;
     wire [31:0] imm_ext_out_WB;
     
@@ -414,7 +448,9 @@ module CPU(reset,
     );
     
     /* mux */
-    assign mem_write_data = (forward_MEM == 0)?read_data_2_MEM:write_register_data_WB;
+    wire [31:0] mem_read_data_final_MEM;
+    assign mem_read_data_final_MEM = (DorP == 1)?mem_read_data_MEM:control_read_data;
+    assign mem_write_data          = (forward_MEM == 0)?read_data_2_MEM:mem_read_data_WB;
     
     //-------------------WB-------------------
     
@@ -426,11 +462,39 @@ module CPU(reset,
     alu_out_WB;
     
     wire [31:0] w_pc;
-    assign w_pc = (pc_source_ID == 2'b00)?pc_IF:
-    (pc_source_ID == 2'b01)?jump_address:
-    (pc_source_ID == 2'b10)?read_data_1_ID:
+    wire [31:0] jump_reg_address;
+    assign jump_reg_address = (forward_A_ID == 2'b01)?alu_out_MEM:
+    (forward_A_ID == 2'b10)?mem_read_data_WB:
+    read_data_1_ID;
+    
+    assign w_pc = (pc_source_ID == 2'b01)?jump_address:
+    (pc_source_ID == 2'b10)?jump_reg_address:
     pc_IF;
     
     assign i_pc = (branch_final == 0)?w_pc:branch_address;
+    
+    //---------------peripherals--------------
+    
+    wire [31:0] clk_count;
+    
+    BCD7 U_BCD7(
+    .reset(reset),
+    .clk(clk),
+    .i_data(digital),
+    .o_data(real_digital)
+    );
+    
+    LED U_LED(
+    .reset(reset),
+    .clk(clk),
+    .i_data(led),
+    .o_data(real_led)
+    );
+    
+    SysClkCounter U_SysClkCounter(
+    .reset(reset),
+    .clk(clk),
+    .o_count(clk_count)
+    );
     
 endmodule

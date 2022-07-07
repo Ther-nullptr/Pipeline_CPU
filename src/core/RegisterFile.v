@@ -16,14 +16,15 @@ module RegisterFile(reset,
     
     reg [31:0] RF_data[31:1];
     
-    assign i_read_data1 = (i_read_register1 == 5'b00000)? 32'h00000000: RF_data[i_read_register1];
-    assign i_read_data2 = (i_read_register2 == 5'b00000)? 32'h00000000: RF_data[i_read_register2];
+    assign o_read_data1 = (i_read_register1 == 5'b00000)? 32'h00000000: RF_data[i_read_register1];
+    assign o_read_data2 = (i_read_register2 == 5'b00000)? 32'h00000000: RF_data[i_read_register2];
     
     integer i;
     always @(posedge reset or posedge clk) begin
 		if (reset) begin
 			for (i = 1; i < 32; i = i + 1) begin
 				RF_data[i] <= 32'h00000000;
+                RF_data[29] <= 32'h00000600; // the $sp is set at 0x600 at first
 			end
 		end else if (i_reg_write && (i_write_register != 5'b00000)) begin
 			RF_data[i_write_register] <= i_write_data;

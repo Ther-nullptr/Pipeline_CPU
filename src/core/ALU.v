@@ -3,7 +3,6 @@ module ALU(i_alu_conf,
            i_sign,
            i_data_1,
            i_data_2,
-           o_relation,
            o_result);
     
     // Control Signals
@@ -13,7 +12,6 @@ module ALU(i_alu_conf,
     input [31:0] i_data_1;
     input [31:0] i_data_2;
     // Result output
-    output reg [1:0] o_relation;
     output reg [31:0] o_result;
     
     // i_alu_conf signal
@@ -27,19 +25,6 @@ module ALU(i_alu_conf,
     parameter SLL_CONF = 4'b0111; // <<
     parameter SRL_CONF = 4'b1000; // >>
     parameter SRA_CONF = 4'b1001; // >>(a)
-    
-    // useful for branch control
-    always @(*) begin
-        if (o_result < 0)begin
-            o_relation <= 2'b00; // <
-        end
-        else if (o_result > 0)begin
-            o_relation <= 2'b01; // >
-        end
-        else begin
-            o_relation <= 2'b10; // = 
-        end
-    end
     
     // IMPORTANT! although the signed and unsigned settings has different results in +,-,&,|..., but they share the same representations
     // However, when it comes to slt and sra, they will produce different o_result performance

@@ -14,7 +14,7 @@ module MEM_WB_Register(reset,
                        o_imm_ext_out,
                        o_reg_write,
                        o_mem_to_reg,
-                       o_mem_read,
+                       o_mem_read
                        );
     input reset;
     input clk;
