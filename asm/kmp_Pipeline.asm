@@ -1,6 +1,6 @@
 main:
     addi $s0, $0, 0 # len_str
-    addi $a1, $0, 0x000 # the address of str: 0x00
+    addi $a1, $0, 0x0000 # the address of str: 0x00
     addi $a2, $0, 1
 
 read_str_entry:
@@ -29,7 +29,7 @@ read_pattern_exit:
     addi $a0, $s0, 0 # len_str
     addi $a1, $0, 0 # str
     addi $a2, $s1, 0 # len_pattern
-    addi $a3, $0, $2 # pattern
+    add $a3, $0, $s2 # pattern
     jal kmp
 
     # play the result on device
@@ -51,31 +51,31 @@ read_pattern_exit:
 
 display_1:
     addi $a0, $s1, 0
-    addi $a1, $0, 100000000
     jal bcd
     lw $s7, 0($s6) # read the num of sys_clk nums
-    bgtz $s7, $t0, display_2
+    sub $s7, $s7, $t0
+    bgtz $s7, display_2
     j display_1
 display_2:
     addi $a0, $s2, 0
-    addi $a1, $0, 1000000000
     jal bcd
     lw $s7, 0($s6)
-    bgtz $s7, $t1, display_3
+    sub $s7, $s7, $t1
+    bgtz $s7, display_3
     j display_2
 display_3:
     addi $a0, $s3, 0
-    addi $a1, $0, 10000000000
     jal bcd
     lw $s7, 0($s6)
-    bgtz $s7, $t2, display_4 
+    sub $s7, $s7, $t2
+    bgtz $s7, display_4 
     j display_3
 display_4:
     addi $a0, $s4, 0
-    addi $a1, $0, 100000000000
     jal bcd
     lw $s7, 0($s6)
-    bltz $s7, $t2, display_1
+    sub $s7, $s7, $t0
+    bltz $s7, display_1
     j display_4
 
 kmp:
@@ -89,7 +89,9 @@ kmp:
     addi $s5, $a2, 0 # save the len_pattern
     addi $s6, $a1, 0 # save the str
     addi $s7, $a3, 0 # save the pattern
-	addi $s0, $0, 0x300 # save the address of next array
+
+	addi $s0, $0, 0x300 # save the address # TODO
+	
 	addi $a0, $s0, 0 # pass the address
 	addi $a1, $a2, 0 # len_pattern
 	addi $a2, $a3, 0 # pattern
@@ -295,6 +297,6 @@ bcd_f:
     j write_bcd
 
 write_bcd:
-    addi $s5, 0, 0x40000010 # the address of bcd
-    add $t1, $a1, 0 # add the enable signal 
+    addi $s5, $0, 0x40000010 # the address of bcd
     sw $t1, 0($s5)
+    

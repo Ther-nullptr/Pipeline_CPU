@@ -1,0 +1,4 @@
+*.asm   eol=lf
+*.txt   eol=lf
+*.out   eol=lf
+*.dat   eol=lf
