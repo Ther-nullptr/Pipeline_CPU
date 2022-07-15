@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module SysClkCounter(reset,
                      clk,
                      o_count);

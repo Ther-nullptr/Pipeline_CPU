@@ -50,7 +50,7 @@ module Control(OpCode,
     parameter BNE_OP  = 6'h05; // branch on not equal(I)
     parameter BLEZ_OP = 6'h06; // branch on < = 0(I)
     parameter BGTZ_OP = 6'h07; // branch on >0(I)
-    parameter BLTZ_OP = 6'h08; // branch on <0(I)
+    parameter BLTZ_OP = 6'h01; // branch on <0(I)
     
     parameter J_OP   = 6'h02; // jump(J)
     parameter JAL_OP = 6'h03; // jump and link(J)
@@ -120,19 +120,19 @@ module Control(OpCode,
             BEQ_OP:begin
                 Branch <= 3'b001;
             end
-
+            
             BNE_OP:begin
                 Branch <= 3'b010;
             end
-
+            
             BLEZ_OP:begin
                 Branch <= 3'b011;
             end
-
+            
             BGTZ_OP:begin
                 Branch <= 3'b100;
             end
-
+            
             BLTZ_OP:begin
                 Branch <= 3'b101;
             end
@@ -266,24 +266,24 @@ module Control(OpCode,
                 ALUSrcB <= 1;
             end
         endcase
-
+        
         // Jump
         case(OpCode)
             J_OP,JAL_OP:begin
                 Jump <= 2'b01;
             end
-
+            
             R_OP:begin
                 case(Funct)
-                JR_FUN,JALR_FUN:begin
-                    Jump <= 2'b10;
-                end
-                default:begin
-                    Jump <= 2'b00;
-                end
+                    JR_FUN,JALR_FUN:begin
+                        Jump <= 2'b10;
+                    end
+                    default:begin
+                        Jump <= 2'b00;
+                    end
                 endcase
             end
-
+            
             default:begin
                 Jump <= 2'b00;
             end
@@ -321,11 +321,11 @@ module Control(OpCode,
     
     always @(*) begin
         case(OpCode)
-            LW_OP,SW_OP,LUI_OP,ADDI_OP,ADDIU_OP:ALUOp <= I1_ALUOP;
-            BEQ_OP,BNE_OP,BLEZ_OP,BGTZ_OP,BLTZ_OP:ALUOp <= I2_ALUOP;
-            ANDI_OP:ALUOp <= AND_ALUOP;
-            SLTI_OP,SLTIU_OP:ALUOp <= SLT_ALUOP;
-            default:ALUOp <= R_ALUOP;
+            LW_OP,SW_OP,LUI_OP,ADDI_OP,ADDIU_OP:    ALUOp <= I1_ALUOP;
+            BEQ_OP,BNE_OP,BLEZ_OP,BGTZ_OP,BLTZ_OP:  ALUOp <= I2_ALUOP;
+            ANDI_OP:                                ALUOp <= AND_ALUOP;
+            SLTI_OP,SLTIU_OP:                       ALUOp <= SLT_ALUOP;
+            default:                                ALUOp <= R_ALUOP;
         endcase
     end
     

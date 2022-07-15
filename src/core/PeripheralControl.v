@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module PeripheralControl(reset,
                          clk,
                          i_address,
@@ -22,18 +23,47 @@ module PeripheralControl(reset,
     output [31:0] o_led;
     output [31:0] o_digital;
     
-    wire [31:0] w_led;
-    wire [31:0] w_digital;
-    wire [31:0] w_clk;
+    reg [31:0] r_led;
+    reg [31:0] r_digital;
+    reg [31:0] r_clk;
     
-    assign o_control_read_data = (~i_control_read)?32'b0:
-                                 (i_address == LED_ADDRESS)?{24'b0, w_led[7:0]}:
-                                 (i_address == DIGITAL_ADDRESS)?{20'b0, w_digital[7:0]}:
-                                 (i_address == SYS_CLK_COUNTER_ADDRESS)?w_clk:
-                                 32'b0;
+    initial begin
+        r_led     <= 32'b0;
+        r_digital <= 32'b0;
+        r_clk     <= 32'b0;
+    end
     
-    assign w_led = (i_control_write && i_address == LED_ADDRESS)?{24'b0, i_control_write_data[7:0]}:w_led;
-    assign w_digital = (i_control_write && i_address == DIGITAL_ADDRESS)?{20'b0, i_control_write_data[11:0]}:w_digital;
-    assign w_clk = (i_control_write && i_address == SYS_CLK_COUNTER_ADDRESS)?i_control_write_data:w_clk;
-       
+    assign o_control_read_data = reset?32'b0:
+    (~i_control_read)?32'b0:
+    (i_address == LED_ADDRESS)?{24'b0, r_led[7:0]}:
+    (i_address == DIGITAL_ADDRESS)?{20'b0, r_digital[7:0]}:
+    (i_address == SYS_CLK_COUNTER_ADDRESS)?r_clk:
+    32'b0;
+    
+    always @(*) begin
+        if(i_control_write && i_address == LED_ADDRESS)begin
+            r_led <= {24'b0, i_control_write_data[7:0]};
+        end
+        else begin
+            r_led <= r_led;
+        end
+
+        if(i_control_write && i_address == DIGITAL_ADDRESS)begin
+            r_digital <= {20'b0, i_control_write_data[11:0]};
+        end
+        else begin
+            r_digital <= r_digital;
+        end
+
+        if(i_control_write && i_address == SYS_CLK_COUNTER_ADDRESS)begin
+            r_clk <= i_control_write_data;
+        end
+        else begin
+            r_clk <= r_clk;
+        end
+    end
+    
+    assign o_led     = reset?0:r_led;
+    assign o_digital = reset?0:r_digital;
+    
 endmodule

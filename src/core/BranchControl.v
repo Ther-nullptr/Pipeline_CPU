@@ -9,9 +9,9 @@ module BranchControl(i_data1,
     output reg o_branch;
     
     wire [1:0] w_relation;
-    assign w_relation = (i_data1 < i_data2)?01:
+    assign w_relation = (i_data1 < i_data2)?00:
     (i_data1 > i_data2)?10:
-    00;
+    01;
     
     // 00:< 01: = 10:>
     always @(*) begin

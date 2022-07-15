@@ -63,6 +63,7 @@ module EX_MEM_Register(reset,
             o_rt             <= 0;
             o_rd             <= 0;
             o_imm_ext        <= 0;
+            o_alu_result     <= 0;
         end
         else begin
             o_reg_write      <= i_reg_write;
@@ -75,6 +76,7 @@ module EX_MEM_Register(reset,
             o_rt             <= i_rt;
             o_rd             <= i_rd;
             o_imm_ext        <= i_imm_ext;
+            o_alu_result     <= i_alu_result;
         end
     end
 endmodule

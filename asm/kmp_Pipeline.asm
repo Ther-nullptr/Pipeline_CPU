@@ -44,7 +44,8 @@ read_pattern_exit:
     srl $s4, $s4, 28 # get the last 4 bits
 
     # write the BCD
-    addi $s6, $0, 0x40000014
+    lui $s6, 0x4000
+    addi $s6, $0, 0x0014
     addi $t0, $0, 10000
     addi $t1, $0, 20000
     addi $t2, $0, 30000
@@ -297,6 +298,7 @@ bcd_f:
     j write_bcd
 
 write_bcd:
-    addi $s5, $0, 0x40000010 # the address of bcd
+    lui $s5, 0x4000
+    addi $s5, $0, 0x0010 # the address of bcd
     sw $t1, 0($s5)
     

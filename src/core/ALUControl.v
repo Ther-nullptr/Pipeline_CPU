@@ -49,6 +49,10 @@ module ALUControl(i_aluop,
     parameter SLL_CONF = 4'b0111; // <<
     parameter SRL_CONF = 4'b1000; // >>
     parameter SRA_CONF = 4'b1001; // >>(a)
+
+    initial begin
+        o_sign <= 1;
+    end
     
     // step 1: to decide the signed & unsigned
     // I & R type
