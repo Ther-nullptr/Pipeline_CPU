@@ -7,11 +7,13 @@ module PeripheralControl(reset,
                          i_control_write_data,
                          o_control_read_data,
                          o_led,
-                         o_digital);
+                         o_digital
+                         );
     
     parameter LED_ADDRESS             = 32'h4000000C;
     parameter DIGITAL_ADDRESS         = 32'h40000010;
     parameter SYS_CLK_COUNTER_ADDRESS = 32'h40000014;
+    parameter CLKS_IN_1MS = 32'd10000; // 100MHz
     
     input reset,clk;
     input i_control_read;
@@ -54,12 +56,17 @@ module PeripheralControl(reset,
         else begin
             r_digital <= r_digital;
         end
+    end
 
-        if(i_control_write && i_address == SYS_CLK_COUNTER_ADDRESS)begin
-            r_clk <= i_control_write_data;
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            r_clk <= 32'h0;
+        end
+        else if(r_clk <= CLKS_IN_1MS*4) begin
+            r_clk <= r_clk + 1;
         end
         else begin
-            r_clk <= r_clk;
+            r_clk <= 32'h0;
         end
     end
     

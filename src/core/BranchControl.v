@@ -3,15 +3,15 @@ module BranchControl(i_data1,
                      i_data2,
                      i_branch,
                      o_branch);
-    input [31:0] i_data1;
-    input [31:0] i_data2;
+    input signed [31:0] i_data1;
+    input signed [31:0] i_data2;
     input [2:0] i_branch;
     output reg o_branch;
     
     wire [1:0] w_relation;
-    assign w_relation = (i_data1 < i_data2)?00:
-    (i_data1 > i_data2)?10:
-    01;
+    assign w_relation = (i_data1 < i_data2)?2'b00:
+    (i_data1 > i_data2)?2'b10:
+    2'b01;
     
     // 00:< 01: = 10:>
     always @(*) begin

@@ -12,6 +12,7 @@ read_str_entry:
 	j read_str_entry
 
 read_str_exit:
+    addi $a1, $a1, 4
     addi $s2, $a1, 0 # store the begin address of pattern
     addi $a2, $0, 1
     addi $s1, $0, 0 # len_pattern
@@ -45,38 +46,38 @@ read_pattern_exit:
 
     # write the BCD
     lui $s6, 0x4000
-    addi $s6, $0, 0x0014
-    addi $t0, $0, 10000
-    addi $t1, $0, 20000
-    addi $t2, $0, 30000
+    addi $s6, $s6, 0x0014
+    addi $t5, $0, 10000
+    addi $t6, $0, 20000
+    addi $t7, $0, 30000
 
 display_1:
     addi $a0, $s1, 0
     jal bcd
     lw $s7, 0($s6) # read the num of sys_clk nums
-    sub $s7, $s7, $t0
-    bgtz $s7, display_2
+    sub $t3, $s7, $t5
+    bgtz $t3, display_2
     j display_1
 display_2:
     addi $a0, $s2, 0
     jal bcd
     lw $s7, 0($s6)
-    sub $s7, $s7, $t1
-    bgtz $s7, display_3
+    sub $t3, $s7, $t6
+    bgtz $t3, display_3
     j display_2
 display_3:
     addi $a0, $s3, 0
     jal bcd
     lw $s7, 0($s6)
-    sub $s7, $s7, $t2
-    bgtz $s7, display_4 
+    sub $t3, $s7, $t7
+    bgtz $t3, display_4 
     j display_3
 display_4:
     addi $a0, $s4, 0
     jal bcd
     lw $s7, 0($s6)
-    sub $s7, $s7, $t0
-    bltz $s7, display_1
+    sub $t3, $s7, $t5
+    bltz $t3, display_1
     j display_4
 
 kmp:
@@ -299,6 +300,6 @@ bcd_f:
 
 write_bcd:
     lui $s5, 0x4000
-    addi $s5, $0, 0x0010 # the address of bcd
+    addi $s5, $s5, 0x0010 # the address of bcd
     sw $t1, 0($s5)
-    
+    jr $ra

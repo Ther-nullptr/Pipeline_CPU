@@ -245,7 +245,7 @@ module CPU(reset,
     Hazard U_Hazard(
     .reset(reset),
     .i_ID_EX_reg_write(reg_write_EX),
-    .i_ID_EX_mem_read(mem_read_EX),
+    .i_ID_EX_mem_to_reg(mem_to_reg_EX),
     .i_write_register_EX(write_register_EX),
     .i_ID_EX_Rt(rt_EX),
     .i_IF_ID_Rs(rs_ID),
@@ -267,10 +267,10 @@ module CPU(reset,
     wire [31:0] mem_read_data_WB;
     
     assign compare_data_1 = (forward_A_ID == 2'b01)?alu_out_MEM:
-    (forward_A_ID == 2'b10)?mem_read_data_WB:
+    (forward_A_ID == 2'b10)?write_register_data_WB:
     read_data_1_ID;
     assign compare_data_2 = (forward_B_ID == 2'b01)?alu_out_MEM:
-    (forward_B_ID == 2'b10)?mem_read_data_WB:
+    (forward_B_ID == 2'b10)?write_register_data_WB:
     read_data_2_ID;
     
     /* module:Branch Control */
@@ -407,11 +407,12 @@ module CPU(reset,
     
     // data or peripheral
     wire DorP;
-    assign DorP = (alu_out_MEM == 32'h4000000C || alu_out_MEM == 32'h40000010 || alu_out_MEM == 32'h40000014)?0:1;
+    assign DorP = (alu_out_MEM == 32'h4000000C || alu_out_MEM == 32'h40000010 || alu_out_MEM == 32'h40000014)?1:0;
     
     /* module:PeripheralControl*/
     PeripheralControl U_PeripheralControl(
     .reset(reset),
+    .clk(clk),
     .i_address(alu_out_MEM),
     .i_control_read(mem_read_MEM),
     .i_control_write(mem_write_MEM),
@@ -438,13 +439,14 @@ module CPU(reset,
     wire [31:0] alu_out_WB;
     wire [31:0] pc_WB;
     wire [31:0] imm_ext_out_WB;
+    wire [31:0] mem_read_data_final_MEM;
     
     /* module:MEM/WB Reg*/
     MEM_WB_Register U_MEM_WB_Register(
     .reset(reset),
     .clk(clk),
     .i_result(alu_out_MEM),
-    .i_mem_read_data(mem_read_data_MEM),
+    .i_mem_read_data(mem_read_data_final_MEM),
     .i_pc_4(pc_MEM),
     .i_imm_ext_out(imm_ext_out_MEM),
     .i_reg_write(reg_write_MEM),
@@ -466,8 +468,7 @@ module CPU(reset,
     );
     
     /* mux */
-    wire [31:0] mem_read_data_final_MEM;
-    assign mem_read_data_final_MEM = (DorP == 1)?mem_read_data_MEM:control_read_data;
+    assign mem_read_data_final_MEM = (DorP == 0)?mem_read_data_MEM:control_read_data;
     assign mem_write_data          = (forward_MEM == 0)?read_data_2_MEM:write_register_data_WB;
     
     //-------------------WB-------------------
@@ -482,7 +483,7 @@ module CPU(reset,
     wire [31:0] w_pc;
     wire [31:0] jump_reg_address;
     assign jump_reg_address = (forward_A_ID == 2'b01)?alu_out_MEM:
-                              (forward_A_ID == 2'b10)?mem_read_data_WB:
+                              (forward_A_ID == 2'b10)?write_register_data_WB:
                               read_data_1_ID;
     
     assign w_pc = (pc_source_ID == 2'b01)?jump_address:
@@ -492,8 +493,6 @@ module CPU(reset,
     assign i_pc = (branch_final == 0)?w_pc:branch_address;
     
     //---------------peripherals--------------
-    
-    wire [31:0] clk_count;
     
     BCD7 U_BCD7(
     .reset(reset),
@@ -507,12 +506,6 @@ module CPU(reset,
     .clk(clk),
     .i_data(led),
     .o_data(real_led)
-    );
-    
-    SysClkCounter U_SysClkCounter(
-    .reset(reset),
-    .clk(clk),
-    .o_count(clk_count)
     );
     
 endmodule

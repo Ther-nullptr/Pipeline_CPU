@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 module Hazard(reset,
               i_ID_EX_reg_write,
-              i_ID_EX_mem_read,
+              i_ID_EX_mem_to_reg,
               i_write_register_EX,
               i_ID_EX_Rt,
               i_IF_ID_Rs,
@@ -17,11 +17,11 @@ module Hazard(reset,
               o_pc_keep);
 
     input reset;
-    input i_ID_EX_mem_read;
     input i_ID_EX_reg_write;
     input i_EX_MEM_mem_read;
     input i_branch_final;
     input [1:0] i_jump;
+    input [1:0] i_ID_EX_mem_to_reg;
     input [2:0] i_branch;
     input [4:0] i_write_register_EX;
     input [4:0] i_ID_EX_Rt;
@@ -40,13 +40,14 @@ module Hazard(reset,
     // R/load-jr/jalr hazard: keep IF_ID_Register, keep PC, flush ID_EX_Register
     // R/load-beq hazard: keep IF_ID_Register, keep PC, flush ID_EX_Register
     // jr/jalr-
-    wire pc_keep1,pc_keep2,pc_keep3;
+    wire pc_keep1,pc_keep2,pc_keep3,pc_keep4;
     
     // for load use hazard & R/load-jr/jalr
-    assign pc_keep1    = (i_ID_EX_mem_read && ((i_ID_EX_Rt == i_IF_ID_Rs) || (i_ID_EX_Rt == i_IF_ID_Rt)));
-    assign pc_keep2    = ((i_jump == 2'b10 || i_branch) && (i_ID_EX_reg_write && ((i_write_register_EX == i_IF_ID_Rs) || (i_write_register_EX == i_IF_ID_Rt))))?1:0;
-    assign pc_keep3    = ((i_jump == 2'b10 || i_branch) && (i_EX_MEM_mem_read && ((i_write_register_MEM == i_IF_ID_Rs) || (i_write_register_MEM == i_IF_ID_Rt))))?1:0;
-    assign o_pc_keep   = reset?0:(pc_keep1 || pc_keep2 || pc_keep3);
+    assign pc_keep1    = ((i_ID_EX_mem_to_reg == 2'b01 || i_ID_EX_mem_to_reg == 2'b11) && ((i_ID_EX_Rt == i_IF_ID_Rs) || (i_ID_EX_Rt == i_IF_ID_Rt)));
+    assign pc_keep2    = (i_ID_EX_mem_to_reg == 2'b10 && (i_IF_ID_Rs == 5'b11111 || i_IF_ID_Rt == 5'b11111));
+    assign pc_keep3    = ((i_jump == 2'b10 || i_branch) && (i_ID_EX_reg_write && ((i_write_register_EX == i_IF_ID_Rs) || (i_write_register_EX == i_IF_ID_Rt))))?1:0;
+    assign pc_keep4    = ((i_jump == 2'b10 || i_branch) && (i_EX_MEM_mem_read && ((i_write_register_MEM == i_IF_ID_Rs) || (i_write_register_MEM == i_IF_ID_Rt))))?1:0;
+    assign o_pc_keep   = reset?0:(pc_keep1 || pc_keep2 || pc_keep3 || pc_keep4);
     assign o_IF_ID_keep = o_pc_keep;
     
     // for beq hazard
