@@ -39,6 +39,7 @@ module Hazard(reset,
     // jump hazard: flush IF_ID_Register
     // R/load-jr/jalr hazard: keep IF_ID_Register, keep PC, flush ID_EX_Register
     // R/load-beq hazard: keep IF_ID_Register, keep PC, flush ID_EX_Register
+    // jr/jalr-
     wire pc_keep1,pc_keep2,pc_keep3;
     
     // for load use hazard & R/load-jr/jalr

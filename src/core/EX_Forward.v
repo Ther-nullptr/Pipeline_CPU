@@ -22,10 +22,10 @@ module EX_Forward(i_ID_EX_Rs,
     wire [1:0] w_forward_B;
     
     wire w_cond1;
-    assign w_cond1 = (i_EX_MEM_reg_write && !i_write_register_MEM);
+    assign w_cond1 = (i_EX_MEM_reg_write && i_write_register_MEM);
     
     wire w_cond2;
-    assign w_cond2 = (i_MEM_WB_reg_write && !i_write_register_WB);
+    assign w_cond2 = (i_MEM_WB_reg_write && i_write_register_WB);
     
     // from EX_MEM Register: 01
     assign w_forward_A = (w_cond1 && (i_write_register_MEM == i_ID_EX_Rs))?2'b01:2'b00;

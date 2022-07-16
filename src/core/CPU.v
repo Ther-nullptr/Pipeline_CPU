@@ -327,6 +327,9 @@ module CPU(reset,
     wire [31:0] pc_MEM;
     wire [31:0] read_data_2_MEM;
     wire [31:0] imm_ext_out_MEM;
+
+    wire [31:0] w_result_1;
+    wire [31:0] w_result_2;
     
     /* module:EX/MEM Reg*/
     EX_MEM_Register U_EX_MEM_Register(
@@ -337,7 +340,7 @@ module CPU(reset,
     .i_mem_read(mem_read_EX),
     .i_mem_write(mem_write_EX),
     .i_pc_4(pc_EX),
-    .i_data_2(read_data_2_EX),
+    .i_data_2(w_result_2),
     .i_imm_ext(imm_ext_out_EX),
     .i_write_register(write_register_EX),
     .i_rt(rt_EX),
@@ -357,22 +360,21 @@ module CPU(reset,
     );
     
     /* mux */
-    
+
+    wire [31:0] forward_num_MEM;
+
     assign write_register_EX = (reg_dst_EX == 2'b00)?rt_EX:
     (reg_dst_EX == 2'b01)?rd_EX:
     (reg_dst_EX == 2'b10)?5'b11111:
     rt_EX;
     
-    wire [31:0] w_result_1;
-    wire [31:0] w_result_2;
-    
     assign w_result_1 = (forward_A_EX == 2'b00)?read_data_1_EX:
-    (forward_A_EX == 2'b01)?alu_out_MEM:
+    (forward_A_EX == 2'b01)?forward_num_MEM:
     (forward_A_EX == 2'b10)?write_register_data_WB:
     read_data_1_EX;
     
     assign w_result_2 = (forward_B_EX == 2'b00)?read_data_2_EX:
-    (forward_B_EX == 2'b01)?alu_out_MEM:
+    (forward_B_EX == 2'b01)?forward_num_MEM:
     (forward_B_EX == 2'b10)?write_register_data_WB:
     read_data_2_EX;
     
@@ -380,6 +382,12 @@ module CPU(reset,
     assign alu_in2 = (alu_src_b_EX == 0)?w_result_2:imm_ext_out_EX;
     
     //-------------------MEM------------------
+
+    assign forward_num_MEM = (mem_to_reg_MEM == 2'b00)?alu_out_MEM:
+    (mem_to_reg_MEM == 2'b10)?pc_MEM:
+    (mem_to_reg_MEM == 2'b11)?imm_ext_out_MEM:
+    alu_out_MEM;
+
     wire [31:0] mem_read_data_MEM;
     wire [31:0] mem_write_data;
     
@@ -415,6 +423,7 @@ module CPU(reset,
     
     wire mem_read_WB;
     wire forward_MEM;
+    wire [1:0] mem_to_reg_WB;
     wire [4:0] rt_WB;
     
     /* module:MEM Forward Unit*/
@@ -422,11 +431,10 @@ module CPU(reset,
     .i_EX_MEM_Rt(rt_MEM),
     .i_MEM_WB_Rt(rt_WB),
     .i_EX_MEM_mem_write(mem_write_MEM),
-    .i_MEM_WB_mem_read(mem_read_WB),
+    .i_MEM_WB_mem_to_reg(mem_to_reg_WB),
     .o_forward(forward_MEM)
     );
     
-    wire [1:0] mem_to_reg_WB;
     wire [31:0] alu_out_WB;
     wire [31:0] pc_WB;
     wire [31:0] imm_ext_out_WB;
@@ -460,7 +468,7 @@ module CPU(reset,
     /* mux */
     wire [31:0] mem_read_data_final_MEM;
     assign mem_read_data_final_MEM = (DorP == 1)?mem_read_data_MEM:control_read_data;
-    assign mem_write_data          = (forward_MEM == 0)?read_data_2_MEM:mem_read_data_WB;
+    assign mem_write_data          = (forward_MEM == 0)?read_data_2_MEM:write_register_data_WB;
     
     //-------------------WB-------------------
     
