@@ -28,12 +28,10 @@ module DataMemory(clk,
     );
     
     always @(*) begin
-        if (i_mem_read)begin
-            o_mem_read_data <= w_mem_read_data;
-        end
-        else begin
-            o_mem_read_data <= 0;
-        end
+        case(i_mem_read)
+            1'b1:o_mem_read_data <= w_mem_read_data;
+            1'b0:o_mem_read_data <= 0;
+        endcase
     end
     
 endmodule

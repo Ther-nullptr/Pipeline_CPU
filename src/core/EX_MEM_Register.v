@@ -65,7 +65,7 @@ module EX_MEM_Register(reset,
             o_imm_ext        <= 0;
             o_alu_result     <= 0;
         end
-        else begin
+        if(!reset)begin
             o_reg_write      <= i_reg_write;
             o_mem_write      <= i_mem_write;
             o_mem_read       <= i_mem_read;

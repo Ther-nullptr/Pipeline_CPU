@@ -21,21 +21,25 @@ module BranchControl(i_data1,
             end
             
             3'b001:begin // beq
-                if (w_relation == 2'b01)begin
+                case(w_relation)
+                2'b01:begin
                     o_branch <= 1;
                 end
-                else begin
+                default:begin
                     o_branch <= 0;
                 end
+                endcase
             end
             
             3'b010:begin // bne
-                if (w_relation != 2'b01)begin
-                    o_branch <= 1;
-                end
-                else begin
+                case(w_relation)
+                2'b01:begin
                     o_branch <= 0;
                 end
+                default:begin
+                    o_branch <= 1;
+                end
+                endcase
             end
             
             3'b011:begin // blez

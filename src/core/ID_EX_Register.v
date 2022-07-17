@@ -110,12 +110,12 @@ module ID_EX_Register(reset,
             o_imm_ext       <= 0;
             o_imm_ext_shift <= 0;
         end
-        else begin
+        if(!reset) begin
             if(i_flush) begin // In fact, we only have to set RegWrite and MemWrite to 0 when flush
                 o_reg_write <= 0;
                 o_mem_write <= 0;
             end
-            else begin
+            if(!i_flush) begin
                 o_reg_write <= i_reg_write;
                 o_mem_write <= i_mem_write;
             end

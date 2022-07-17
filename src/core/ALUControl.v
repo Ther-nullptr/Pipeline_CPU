@@ -66,8 +66,36 @@ module ALUControl(i_aluop,
     end
     
     // step 2: generate o_aluconf according to i_funct
+    // always @(*) begin
+    //     if (i_aluop == R_ALUOP) begin // R type, decide the o_aluconf by i_funct
+    //         case(i_funct)
+    //             ADD_FUN,ADDU_FUN:o_aluconf  <= ADD_CONF;
+    //             SUB_FUN,SUBU_FUN:o_aluconf  <= SUB_CONF;
+    //             AND_FUN:o_aluconf <= AND_CONF;
+    //             OR_FUN:o_aluconf  <= OR_CONF;
+    //             XOR_FUN:o_aluconf <= XOR_CONF;
+    //             NOR_FUN:o_aluconf <= NOR_CONF;
+    //             SLT_FUN,SLTU_FUN:o_aluconf  <= SLT_CONF;
+    //             SLL_FUN:o_aluconf  <= SLL_CONF;
+    //             SRL_FUN:o_aluconf  <= SRL_CONF;
+    //             SRA_FUN:o_aluconf  <= SRA_CONF;
+    //         endcase
+    //     end
+    //     else if (i_aluop == I1_ALUOP) // use add
+    //         o_aluconf <= ADD_CONF;
+    //     else if (i_aluop == I2_ALUOP) // use sub
+    //         o_aluconf <= SUB_CONF;
+    //     else if (i_aluop == AND_ALUOP) // use and
+    //         o_aluconf <= AND_CONF;
+    //     else if (i_aluop == SLT_ALUOP) // use slt
+    //         o_aluconf <= SLT_CONF;
+    //     else
+    //         o_aluconf <= ADD_CONF;
+    // end
+
     always @(*) begin
-        if (i_aluop == R_ALUOP) begin // R type, decide the o_aluconf by i_funct
+        case(i_aluop)
+        R_ALUOP:begin // R type, decide the o_aluconf by i_funct
             case(i_funct)
                 ADD_FUN,ADDU_FUN:o_aluconf  <= ADD_CONF;
                 SUB_FUN,SUBU_FUN:o_aluconf  <= SUB_CONF;
@@ -81,16 +109,17 @@ module ALUControl(i_aluop,
                 SRA_FUN:o_aluconf  <= SRA_CONF;
             endcase
         end
-        else if (i_aluop == I1_ALUOP) // use add
+        I1_ALUOP: // use add
             o_aluconf <= ADD_CONF;
-        else if (i_aluop == I2_ALUOP) // use sub
+        I2_ALUOP: // use sub
             o_aluconf <= SUB_CONF;
-        else if (i_aluop == AND_ALUOP) // use and
+        i_aluop == AND_ALUOP: // use and
             o_aluconf <= AND_CONF;
-        else if (i_aluop == SLT_ALUOP) // use slt
+        i_aluop == SLT_ALUOP: // use slt
             o_aluconf <= SLT_CONF;
-        else
+        default:
             o_aluconf <= ADD_CONF;
+        endcase
     end
     
 endmodule
