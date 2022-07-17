@@ -89,33 +89,12 @@ module ID_EX_Register(reset,
     
     
     always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            o_reg_write     <= 0;
-            o_mem_read      <= 0;
-            o_mem_write     <= 0;
-            o_alu_src_a     <= 0;
-            o_alu_src_b     <= 0;
-            o_branch        <= 0;
-            o_pc_4          <= 0;
-            o_data_1        <= 0;
-            o_data_2        <= 0;
-            o_mem_to_reg    <= 0;
-            o_reg_dst       <= 0;
-            o_alu_op        <= 0;
-            o_rs            <= 0;
-            o_rt            <= 0;
-            o_rd            <= 0;
-            o_shamt         <= 0;
-            o_funct         <= 0;
-            o_imm_ext       <= 0;
-            o_imm_ext_shift <= 0;
-        end
-        if(!reset) begin
+        if (!reset) begin
             if(i_flush) begin // In fact, we only have to set RegWrite and MemWrite to 0 when flush
                 o_reg_write <= 0;
                 o_mem_write <= 0;
             end
-            if(!i_flush) begin
+            else begin
                 o_reg_write <= i_reg_write;
                 o_mem_write <= i_mem_write;
             end
@@ -137,6 +116,27 @@ module ID_EX_Register(reset,
             o_funct         <= i_funct;
             o_imm_ext       <= i_imm_ext;
             o_imm_ext_shift <= i_imm_ext_shift;
+        end
+        else begin
+            o_reg_write     <= 0;
+            o_mem_read      <= 0;
+            o_mem_write     <= 0;
+            o_alu_src_a     <= 0;
+            o_alu_src_b     <= 0;
+            o_branch        <= 0;
+            o_pc_4          <= 0;
+            o_data_1        <= 0;
+            o_data_2        <= 0;
+            o_mem_to_reg    <= 0;
+            o_reg_dst       <= 0;
+            o_alu_op        <= 0;
+            o_rs            <= 0;
+            o_rt            <= 0;
+            o_rd            <= 0;
+            o_shamt         <= 0;
+            o_funct         <= 0;
+            o_imm_ext       <= 0;
+            o_imm_ext_shift <= 0;
         end
     end
 endmodule
