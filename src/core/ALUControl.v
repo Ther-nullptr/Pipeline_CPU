@@ -57,41 +57,16 @@ module ALUControl(i_aluop,
     // step 1: to decide the signed & unsigned
     // I & R type
     always @(*) begin
-        if (i_aluop == R_ALUOP) begin
+        case(i_aluop)
+        R_ALUOP: begin
             case(i_funct)
                 ADDU_FUN,SUBU_FUN,SLTU_FUN: o_sign <= 0;
                 default: o_sign                    <= 1;
             endcase
         end
+        default:o_sign <= 1;
+        endcase
     end
-    
-    // step 2: generate o_aluconf according to i_funct
-    // always @(*) begin
-    //     if (i_aluop == R_ALUOP) begin // R type, decide the o_aluconf by i_funct
-    //         case(i_funct)
-    //             ADD_FUN,ADDU_FUN:o_aluconf  <= ADD_CONF;
-    //             SUB_FUN,SUBU_FUN:o_aluconf  <= SUB_CONF;
-    //             AND_FUN:o_aluconf <= AND_CONF;
-    //             OR_FUN:o_aluconf  <= OR_CONF;
-    //             XOR_FUN:o_aluconf <= XOR_CONF;
-    //             NOR_FUN:o_aluconf <= NOR_CONF;
-    //             SLT_FUN,SLTU_FUN:o_aluconf  <= SLT_CONF;
-    //             SLL_FUN:o_aluconf  <= SLL_CONF;
-    //             SRL_FUN:o_aluconf  <= SRL_CONF;
-    //             SRA_FUN:o_aluconf  <= SRA_CONF;
-    //         endcase
-    //     end
-    //     else if (i_aluop == I1_ALUOP) // use add
-    //         o_aluconf <= ADD_CONF;
-    //     else if (i_aluop == I2_ALUOP) // use sub
-    //         o_aluconf <= SUB_CONF;
-    //     else if (i_aluop == AND_ALUOP) // use and
-    //         o_aluconf <= AND_CONF;
-    //     else if (i_aluop == SLT_ALUOP) // use slt
-    //         o_aluconf <= SLT_CONF;
-    //     else
-    //         o_aluconf <= ADD_CONF;
-    // end
 
     always @(*) begin
         case(i_aluop)
@@ -113,9 +88,9 @@ module ALUControl(i_aluop,
             o_aluconf <= ADD_CONF;
         I2_ALUOP: // use sub
             o_aluconf <= SUB_CONF;
-        i_aluop == AND_ALUOP: // use and
+        AND_ALUOP: // use and
             o_aluconf <= AND_CONF;
-        i_aluop == SLT_ALUOP: // use slt
+        SLT_ALUOP: // use slt
             o_aluconf <= SLT_CONF;
         default:
             o_aluconf <= ADD_CONF;

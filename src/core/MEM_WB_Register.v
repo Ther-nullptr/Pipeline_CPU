@@ -58,7 +58,7 @@ module MEM_WB_Register(reset,
             o_rt             <= i_rt;
             o_rd             <= i_rd;
         end
-        if(!reset) begin
+        else begin
             o_reg_write      <= 0;
             o_mem_read       <= 0;
             o_mem_to_reg     <= 0;
