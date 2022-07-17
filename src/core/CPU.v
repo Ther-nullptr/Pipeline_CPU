@@ -501,11 +501,6 @@ module CPU(reset,
     .o_data(real_digital)
     );
     
-    LED U_LED(
-    .reset(reset),
-    .clk(clk),
-    .i_data(led),
-    .o_data(real_led)
-    );
+    assign real_led = o_pc[9:2];
     
 endmodule

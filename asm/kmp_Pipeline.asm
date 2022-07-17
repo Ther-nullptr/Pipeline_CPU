@@ -52,6 +52,7 @@ read_pattern_exit:
     addi $t7, $0, 30000
 
 display_1:
+    addi $t4, $0, 0x100
     addi $a0, $s1, 0
     jal bcd
     lw $s7, 0($s6) # read the num of sys_clk nums
@@ -59,6 +60,7 @@ display_1:
     bgtz $t3, display_2
     j display_1
 display_2:
+    addi $t4, $0, 0x200
     addi $a0, $s2, 0
     jal bcd
     lw $s7, 0($s6)
@@ -66,6 +68,7 @@ display_2:
     bgtz $t3, display_3
     j display_2
 display_3:
+    addi $t4, $0, 0x400
     addi $a0, $s3, 0
     jal bcd
     lw $s7, 0($s6)
@@ -73,6 +76,7 @@ display_3:
     bgtz $t3, display_4 
     j display_3
 display_4:
+    addi $t4, $0, 0x800
     addi $a0, $s4, 0
     jal bcd
     lw $s7, 0($s6)
@@ -301,5 +305,6 @@ bcd_f:
 write_bcd:
     lui $s5, 0x4000
     addi $s5, $s5, 0x0010 # the address of bcd
+    add $t1, $t1, $t4
     sw $t1, 0($s5)
     jr $ra

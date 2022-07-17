@@ -7,7 +7,7 @@ module CPU_tb;
     wire [7:0] led;
     wire [11:0] bcd7;
 
-    parameter PERIOD = 10;
+    parameter PERIOD = 5000;
 
     CPU U_CPU(
         .reset(reset),
