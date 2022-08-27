@@ -14,8 +14,8 @@ module DataMemory(clk,
     output reg [31:0] o_mem_read_data;
     
     wire [31:0] w_mem_read_data;
-
-    initial begin 
+    
+    initial begin
         o_mem_read_data <= 0;
     end
     
@@ -33,5 +33,4 @@ module DataMemory(clk,
             1'b0:o_mem_read_data <= 0;
         endcase
     end
-    
 endmodule

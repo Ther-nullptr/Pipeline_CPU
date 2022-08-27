@@ -17,6 +17,8 @@ module PC(reset,
     //Output PC
     output reg [31:0] o_pc;
     
+    reg [31:0] num;
+    
     initial begin
         o_pc <= 0;
     end

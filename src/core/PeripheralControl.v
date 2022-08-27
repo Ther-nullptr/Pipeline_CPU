@@ -5,6 +5,9 @@ module PeripheralControl(reset,
                          i_control_read,
                          i_control_write,
                          i_control_write_data,
+                         i_uart_rxd,
+                         i_uart_txd,
+                         i_uart_con,
                          o_control_read_data,
                          o_led,
                          o_digital
@@ -13,6 +16,9 @@ module PeripheralControl(reset,
     parameter LED_ADDRESS             = 32'h4000000C;
     parameter DIGITAL_ADDRESS         = 32'h40000010;
     parameter SYS_CLK_COUNTER_ADDRESS = 32'h40000014;
+    parameter UART_TXD_ADDRESS        = 32'h40000018;
+    parameter UART_RXD_ADDRESS        = 32'h4000001C;
+    parameter UART_CON_ADDRESS        = 32'h40000020;
     parameter CLKS_IN_1MS = 32'd10000; // 100MHz
     
     input reset,clk;
@@ -20,6 +26,10 @@ module PeripheralControl(reset,
     input i_control_write;
     input [31:0] i_address;
     input [31:0] i_control_write_data;
+
+    input [7:0] i_uart_rxd;
+    input [7:0] i_uart_txd;
+    input [2:0] i_uart_con;
     
     output [31:0] o_control_read_data;
     output [31:0] o_led;
@@ -40,6 +50,9 @@ module PeripheralControl(reset,
     (i_address == LED_ADDRESS)?{24'b0, r_led[7:0]}:
     (i_address == DIGITAL_ADDRESS)?{20'b0, r_digital[7:0]}:
     (i_address == SYS_CLK_COUNTER_ADDRESS)?r_clk:
+    (i_address == UART_TXD_ADDRESS)?i_uart_txd:
+    (i_address == UART_RXD_ADDRESS)?i_uart_rxd:
+    (i_address == UART_CON_ADDRESS)?i_uart_con:
     32'b0;
     
     always @(*) begin

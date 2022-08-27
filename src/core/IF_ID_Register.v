@@ -17,6 +17,11 @@ module IF_ID_Register(reset,
     output reg [31:0] o_pc_4;
     output reg [31:0] o_instruction;
     
+    reg [31:0] num;
+    initial begin
+        num <= 0;
+    end
+    
     always @(posedge reset or posedge clk) begin
         if (reset) begin
             o_pc_4        <= 32'b0;
@@ -35,6 +40,7 @@ module IF_ID_Register(reset,
                     o_instruction <= i_instruction;
                 end
                 o_pc_4 <= i_pc_4;
+                num <= num + 1;
             end
         end
     end

@@ -87,18 +87,10 @@ module ID_EX_Register(reset,
     output reg [31:0] o_imm_ext;
     output reg [31:0] o_imm_ext_shift;
     
-    
-    always @(posedge clk or posedge reset) begin
-        if (!reset) begin
-            if(i_flush) begin // In fact, we only have to set RegWrite and MemWrite to 0 when flush
-                o_reg_write <= 0;
-                o_mem_write <= 0;
-            end
-            else begin
-                o_reg_write <= i_reg_write;
-                o_mem_write <= i_mem_write;
-            end
-            
+    always @(posedge clk) begin
+        if (!i_flush) begin
+            o_reg_write     <= i_reg_write;
+            o_mem_write     <= i_mem_write;
             o_mem_read      <= i_mem_read;
             o_alu_src_a     <= i_alu_src_a;
             o_alu_src_b     <= i_alu_src_b;
@@ -116,6 +108,7 @@ module ID_EX_Register(reset,
             o_funct         <= i_funct;
             o_imm_ext       <= i_imm_ext;
             o_imm_ext_shift <= i_imm_ext_shift;
+            
         end
         else begin
             o_reg_write     <= 0;

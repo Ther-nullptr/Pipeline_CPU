@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
-module Hazard(reset,
+module Hazard(clk,
+              reset,
               i_ID_EX_reg_write,
               i_ID_EX_mem_to_reg,
               i_write_register_EX,
@@ -15,7 +16,8 @@ module Hazard(reset,
               o_ID_EX_flush,
               o_IF_ID_keep,
               o_pc_keep);
-
+    
+    input clk;
     input reset;
     input i_ID_EX_reg_write;
     input i_EX_MEM_mem_read;
@@ -32,6 +34,12 @@ module Hazard(reset,
     output o_ID_EX_flush;
     output o_IF_ID_keep;
     output o_pc_keep;
+    
+    reg [31:0] total_stall_or_flush_num;
+    
+    initial begin
+        total_stall_or_flush_num <= 0;
+    end
     
     // deal with 6 kinds of hazard
     // load use hazard: keep IF_ID_Register, keep PC, flush ID_EX_Register
@@ -57,5 +65,5 @@ module Hazard(reset,
     // for jump hazard
     assign o_IF_ID_flush = reset?0:
                            (i_branch_final || i_jump);
-    
+
 endmodule

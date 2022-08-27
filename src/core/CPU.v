@@ -243,6 +243,7 @@ module CPU(reset,
     
     /* module:Hazard Unit*/
     Hazard U_Hazard(
+    .clk(clk),
     .reset(reset),
     .i_ID_EX_reg_write(reg_write_EX),
     .i_ID_EX_mem_to_reg(mem_to_reg_EX),

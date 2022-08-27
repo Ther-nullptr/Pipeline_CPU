@@ -45,8 +45,7 @@ module MEM_WB_Register(reset,
     output reg [31:0] o_pc_4;
     output reg [31:0] o_imm_ext_out;
     
-    always @(posedge clk or posedge reset) begin
-        if (!reset) begin
+    always @(posedge clk) begin
             o_reg_write      <= i_reg_write;
             o_mem_read       <= i_mem_read;
             o_pc_4           <= i_pc_4;
@@ -57,19 +56,6 @@ module MEM_WB_Register(reset,
             o_write_register <= i_write_register;
             o_rt             <= i_rt;
             o_rd             <= i_rd;
-        end
-        else begin
-            o_reg_write      <= 0;
-            o_mem_read       <= 0;
-            o_mem_to_reg     <= 0;
-            o_pc_4           <= 0;
-            o_result         <= 0;
-            o_mem_read_data  <= 0;
-            o_imm_ext_out    <= 0;
-            o_write_register <= 0;
-            o_rt             <= 0;
-            o_rd             <= 0;
-        end
     end
     
 endmodule

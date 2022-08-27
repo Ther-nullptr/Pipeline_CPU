@@ -82,6 +82,7 @@ module ALUControl(i_aluop,
                 SLL_FUN:o_aluconf  <= SLL_CONF;
                 SRL_FUN:o_aluconf  <= SRL_CONF;
                 SRA_FUN:o_aluconf  <= SRA_CONF;
+                default:o_aluconf  <= ADD_CONF;
             endcase
         end
         I1_ALUOP: // use add

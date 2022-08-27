@@ -2,13 +2,13 @@ main:
     addi $s0, $0, 0 # len_str
     addi $a1, $0, 0x0000 # the address of str: 0x00
     addi $a2, $0, 1
+    addi $t1, $zero, 10 # '10' means '\n'
 
 read_str_entry:
     lw $t0, 0($a1)
-    addi $t1, $zero, 10 # '10' means '\n'
-    beq $t0, $t1, read_str_exit
-	addi $a1, $a1, 4
+    addi $a1, $a1, 4
 	addi $s0, $s0, 1
+    beq $t0, $t1, read_str_exit
 	j read_str_entry
 
 read_str_exit:
@@ -19,10 +19,9 @@ read_str_exit:
 
 read_pattern_entry:
     lw $t0, 0($a1)
-	addi $t1, $zero, 10 # '10' means '\n'
-	beq $t0, $t1, read_pattern_exit
-	addi $a1, $a1, 4
+    addi $a1, $a1, 4
 	addi $s1, $s1, 1
+	beq $t0, $t1, read_pattern_exit
 	j read_pattern_entry
 
 read_pattern_exit:
@@ -148,8 +147,8 @@ kmp_end_if:
     j kmp_loop
 
 kmp_exit:
-    addi $v0, $s2, 0 # return cnt
     lw $ra, 0($sp)
+    addi $v0, $s2, 0 # return cnt
     addi $sp, $sp, 4
     jr $ra
 
@@ -164,7 +163,7 @@ generate_next:
     sw $s2, 0($sp)
 	addi $s1, $0, 1 # i
 	addi $s2, $0, 0 # j
-	beq $a1, 0, end_1
+	beq $a1, $0, end_1
 	addi $s0, $a2, 0 # pointer of pattern
     addi $s3, $a0, 0 # pointer of next
 	sw $zero, 0($s3) # next[0] = 0

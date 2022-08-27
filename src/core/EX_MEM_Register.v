@@ -51,8 +51,7 @@ module EX_MEM_Register(reset,
     output reg [31:0] o_imm_ext;
     output reg [31:0] o_alu_result;
     
-    always @(posedge clk or posedge reset) begin
-        if (!reset) begin
+    always @(posedge clk) begin
             o_reg_write      <= i_reg_write;
             o_mem_write      <= i_mem_write;
             o_mem_read       <= i_mem_read;
@@ -64,19 +63,6 @@ module EX_MEM_Register(reset,
             o_rd             <= i_rd;
             o_imm_ext        <= i_imm_ext;
             o_alu_result     <= i_alu_result;
-        end
-        else begin
-            o_reg_write      <= 0;
-            o_mem_read       <= 0;
-            o_mem_write      <= 0;
-            o_pc_4           <= 0;
-            o_data_2         <= 0;
-            o_mem_to_reg     <= 0;
-            o_write_register <= 0;
-            o_rt             <= 0;
-            o_rd             <= 0;
-            o_imm_ext        <= 0;
-            o_alu_result     <= 0;
-        end
+        
     end
 endmodule
